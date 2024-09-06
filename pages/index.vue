@@ -1,7 +1,24 @@
 <template>
   <div class="min-h-screen bg-base-200">
+    <!-- Fixed Blurry Navbar -->
+    <div class="navbar bg-base-100 bg-opacity-30 backdrop-blur-lg fixed top-0 z-50">
+      <div class="navbar-start">
+        <a class="btn btn-ghost normal-case text-xl">nujin</a>
+      </div>
+      <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#cta">Get Started</a></li>
+        </ul>
+      </div>
+      <div class="navbar-end">
+        <a class="btn btn-primary btn-outline">Enter App</a>
+      </div>
+    </div>
+
     <!-- Hero Section -->
-    <div class="hero min-h-screen bg-base-200">
+    <div class="hero min-h-screen bg-base-200" id="bg">
       <div class="hero-content text-center">
         <div class="max-w-md">
           <div class="flex justify-center w-full p-4">
@@ -32,7 +49,7 @@
     </div>
 
     <!-- Features Section -->
-    <div class="py-16 bg-base-100">
+    <div class="py-16 bg-base-100" id="features">
       <div class="container mx-auto px-4">
         <h2 class="text-3xl font-bold text-center mb-8">Key Features</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -68,7 +85,7 @@
     </div>
 
     <!-- How It Works Section -->
-    <div class="py-16 bg-base-200">
+    <div class="py-16 bg-base-200" id="how-it-works">
       <div class="container mx-auto px-4">
         <h2 class="text-3xl font-bold text-center mb-8">How It Works</h2>
         <ul class="steps steps-vertical lg:steps-horizontal w-full">
@@ -82,7 +99,7 @@
     </div>
 
     <!-- Call to Action -->
-    <div class="py-16 bg-base-100">
+    <div class="py-16 bg-base-100" id="cta">
       <div class="container mx-auto px-4 text-center">
         <h2 class="text-3xl font-bold mb-4">Ready to Build Your Web App?</h2>
         <p class="mb-8">
@@ -109,4 +126,7 @@ const repoLink = "https://github.com/nujinDevelopment/boilerplate"
 
 <style scoped>
 /* Add any component-specific styles here */
+.bg {
+  background-image: url("data:image/svg+xml,<svg id='patternId' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><defs><pattern id='a' patternUnits='userSpaceOnUse' width='29' height='50.115' patternTransform='scale(2) rotate(0)'><rect x='0' y='0' width='100%' height='100%' fill='hsla(0, 0%, 50%, 1)'/><path d='M14.498 16.858L0 8.488.002-8.257l14.5-8.374L29-8.26l-.002 16.745zm0 50.06L0 58.548l.002-16.745 14.5-8.373L29 41.8l-.002 16.744zM28.996 41.8l-14.498-8.37.002-16.744L29 8.312l14.498 8.37-.002 16.745zm-29 0l-14.498-8.37.002-16.744L0 8.312l14.498 8.37-.002 16.745z'  stroke-width='1' stroke='hsla(258.5,59.4%,59.4%,1)' fill='none'/></pattern></defs><rect width='800%' height='800%' transform='translate(0,0)' fill='url(%23a)'/></svg>")
+}
 </style>

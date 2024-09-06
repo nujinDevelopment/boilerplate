@@ -4,10 +4,12 @@
     
     <!-- Main content -->
     <main class="drawer-content">
-      <div class="lg:p-10">
-        <AppHeader />
-        <slot />
-      </div>
+      <section class="bg">
+        <div class="lg:p-10">
+          <AppHeader />
+          <slot />
+        </div>
+      </section>
     </main>
 
     <!-- Sidebar -->
