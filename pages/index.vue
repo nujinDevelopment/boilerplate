@@ -17,9 +17,7 @@
           </div>
           <h1 class="text-5xl">nujin</h1>
           <p class="py-6">
-            A powerful Nuxt.js PWA boilerplate with DaisyUI and Supabase for
-            rapidly building web apps with authentication, landing page, and
-            dashboard.
+            Build with ease.
           </p>
           <a
             :href="repoLink"
