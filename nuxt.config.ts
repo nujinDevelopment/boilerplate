@@ -25,14 +25,14 @@ export default defineNuxtConfig({
     redirect: false,
     redirectOptions: {
       // login: '/login',
-      // callback: '/callback'
+      // callback: '/confirm'
     }
   },
 
   runtimeConfig: {
     public: {
-      // supabaseUrl: process.env.SUPABASE_URL,
-      // supabaseKey: process.env.SUPABASE_KEY
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseKey: process.env.SUPABASE_KEY
     }
   },
 
@@ -42,7 +42,7 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt'
   ],
 
-  // Add this line to use the auth middleware globally
+  // We'll handle the auth middleware in the auth.global.ts file
   routeRules: {
     // '/app/**': { middleware: ['auth'] }
   }

@@ -34,7 +34,7 @@ const logout = async () => {
           <span class="badge badge-success">12</span>
         </a>
       </li>
-      <li><a>Settings</a></li>
+      <li><NuxtLink to="/app/settings">Settings</NuxtLink></li>
       <li><a @click="logout">Logout</a></li>
     </ul>
   </div>

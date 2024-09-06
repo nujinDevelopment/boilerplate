@@ -7,51 +7,81 @@ const loginError = ref('')
 const register = ref(false)
 
 const signInWithEmail = async () => {
+  console.log('signInWithEmail function called')
   loginError.value = ''
-  const { error } = await supabase.auth.signInWithPassword({
-    email: email.value,
-    password: password.value,
-  })
-  if (error) {
-    loginError.value = error.message
-  } else {
-    // Redirect to dashboard or home page
-    navigateTo('/app')
+  console.log('Attempting to sign in with email:', email.value)
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.value,
+      password: password.value,
+    })
+    console.log('Sign in response:', { data, error })
+    if (error) {
+      loginError.value = error.message
+      console.error('Sign in error:', error)
+    } else {
+      console.log('Sign in successful, redirecting to /app')
+      navigateTo('/app')
+    }
+  } catch (e) {
+    console.error('Unexpected error during sign in:', e)
+    loginError.value = 'An unexpected error occurred'
   }
 }
 
 const signUp = async () => {
+  console.log('signUp function called')
   loginError.value = ''
   if (password.value !== confirmPassword.value) {
     loginError.value = "Passwords don't match"
     return
   }
-  const { error } = await supabase.auth.signUp({
-    email: email.value,
-    password: password.value,
-  })
-  if (error) {
-    loginError.value = error.message
-  } else {
-    // Show message to check email for confirmation
-    alert('Please check your email for the confirmation link')
-    register.value = false
+  console.log('Attempting to sign up with email:', email.value)
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email.value,
+      password: password.value,
+    })
+    console.log('Sign up response:', { data, error })
+    if (error) {
+      loginError.value = error.message
+      console.error('Sign up error:', error)
+    } else {
+      console.log('Sign up successful, check email for confirmation')
+      alert('Please check your email for the confirmation link')
+      register.value = false
+    }
+  } catch (e) {
+    console.error('Unexpected error during sign up:', e)
+    loginError.value = 'An unexpected error occurred'
   }
 }
 
 const signInWithOtp = async () => {
   loginError.value = ''
-  const { error } = await supabase.auth.signInWithOtp({
+  console.log('Attempting to sign in with OTP for email:', email.value)
+  const { data, error } = await supabase.auth.signInWithOtp({
     email: email.value,
     options: {
       emailRedirectTo: 'http://localhost:3000/confirm',
     }
   })
+  console.log('OTP sign in response:', { data, error })
   if (error) {
     loginError.value = error.message
+    console.error('OTP sign in error:', error)
   } else {
-    // Show message to check email
+    console.log('OTP sign in successful, check email for login link')
     alert('Please check your email for the login link')
+  }
+}
+
+const handleSubmit = () => {
+  console.log('Form submitted')
+  if (register.value) {
+    signUp()
+  } else {
+    signInWithEmail()
   }
 }
 </script>
@@ -61,7 +91,7 @@ const signInWithOtp = async () => {
     <div class="card w-full max-w-sm shadow-2xl bg-base-100">
       <div class="card-body">
         <h2 class="card-title text-center mb-8">{{ register ? 'Register' : 'Login' }}</h2>
-        <form @submit.prevent="register ? signUp : signInWithEmail">
+        <form @submit.prevent="handleSubmit">
           <div class="form-control">
             <label class="label" for="email">
               <span class="label-text">Email</span>
