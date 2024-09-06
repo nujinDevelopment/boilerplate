@@ -3,24 +3,16 @@
     <label for="my-drawer" class="drawer-overlay"></label>
     <nav class="flex min-h-screen w-72 flex-col gap-2 overflow-y-auto bg-base-100 px-6 py-10">
       <div class="mx-4 flex items-center gap-2 font-black">
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 1024 1024"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <rect x="256" y="670.72" width="512" height="256" rx="128" class="fill-base-content" />
-          <circle cx="512" cy="353.28" r="256" class="fill-base-content" />
-          <circle
-            cx="512"
-            cy="353.28"
-            r="261"
-            stroke="black"
-            stroke-opacity="0.2"
-            stroke-width="10" />
-          <circle cx="512" cy="353.28" r="114.688" class="fill-base-100" />
+        <svg class="fill-base-content w-12 h-12" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512">
+          <g>
+            <g>
+              <path d="m365.5,191.5v-106.7c0-7.2-3.8-13.8-9.9-17.5l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.1-3.7 9.9-10.3 9.9-17.5z"/>
+              <path d="m220,303l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0-7.2-3.7-13.8-9.9-17.5z"/>
+              <path d="m491.1,302.9l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0.1-7.2-3.7-13.8-9.8-17.5z"/>
+            </g>
+          </g>
         </svg>
-        Daisy Corp
+        nujin
       </div>
       <ul class="menu">
         <li v-for="(item, index) in menuItems" :key="index">
@@ -37,10 +29,10 @@
               </ul>
             </details>
           </template>
-          <a v-else :class="{ active: item.active }">
+          <NuxtLink v-else :to="item.to" :class="{ active: isActive(item) }">
             <component :is="item.icon" class="h-5 w-5" />
             {{ item.label }}
-          </a>
+          </NuxtLink>
         </li>
       </ul>
     </nav>
@@ -49,6 +41,7 @@
 
 <script setup>
 import { defineComponent, h } from 'vue';
+import { useRoute } from '#imports';
 
 const IconHome = defineComponent({
   render: () => h('svg', { xmlns: "http://www.w3.org/2000/svg", class: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" },
@@ -68,9 +61,11 @@ const IconProducts = defineComponent({
   )
 });
 
+const route = useRoute();
+
 const menuItems = [
-  { label: 'Dashboard', icon: IconHome, active: true },
-  { label: 'Users', icon: IconUser },
+  { label: 'Dashboard', icon: IconHome, to: '/app/' },
+  { label: 'Users', icon: IconUser, to: '/app/users' },
   { 
     label: 'Products', 
     icon: IconProducts,
@@ -78,4 +73,10 @@ const menuItems = [
   },
   // Add more menu items here
 ];
+
+const isActive = (item) => {
+  if (item.to === route.path) {
+    return true;
+  }
+};
 </script>

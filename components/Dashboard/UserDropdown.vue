@@ -25,7 +25,7 @@ const logout = async () => {
     <ul
       tabindex="0"
       class="menu dropdown-content mt-3 w-52 rounded-box bg-base-100 p-2 shadow-2xl">
-      <li>
+      <!-- <li>
         <a>Profile</a>
       </li>
       <li>
@@ -33,7 +33,7 @@ const logout = async () => {
           Inbox
           <span class="badge badge-success">12</span>
         </a>
-      </li>
+      </li> -->
       <li><NuxtLink to="/app/settings">Settings</NuxtLink></li>
       <li><a @click="logout">Logout</a></li>
     </ul>
