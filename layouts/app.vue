@@ -5,19 +5,19 @@
     <!-- Main content -->
     <main class="drawer-content">
       <div class="lg:p-10">
-        <DashboardHeader />
+        <AppHeader />
         <slot />
       </div>
     </main>
 
     <!-- Sidebar -->
-    <DashboardSidebar />
+    <AppSidebar />
   </div>
 </template>
 
 <script setup>
-import DashboardHeader from '~/components/Dashboard/Header.vue';
-import DashboardSidebar from '~/components/Dashboard/Sidebar.vue';
+import AppHeader from '~/components/App/Header.vue';
+import AppSidebar from '~/components/App/Sidebar.vue';
 
 // Add any necessary component logic here
 </script>

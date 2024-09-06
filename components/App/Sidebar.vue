@@ -2,7 +2,7 @@
   <aside class="drawer-side z-10">
     <label for="my-drawer" class="drawer-overlay"></label>
     <nav class="flex min-h-screen w-72 flex-col gap-2 overflow-y-auto bg-base-100 px-6 py-10">
-      <div class="mx-4 flex items-center gap-2 font-black">
+      <NuxtLink class="mx-4 flex items-center gap-2 font-black" to="/">
         <svg class="fill-base-content w-12 h-12" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512">
           <g>
             <g>
@@ -13,7 +13,7 @@
           </g>
         </svg>
         nujin
-      </div>
+      </NuxtLink>
       <ul class="menu">
         <li v-for="(item, index) in menuItems" :key="index">
           <template v-if="item.subItems">

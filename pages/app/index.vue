@@ -1,16 +1,16 @@
 <template>
   <div class="grid grid-cols-12 grid-rows-[min-content] gap-y-12 p-4 lg:gap-x-12 ">
-    <DashboardStats />
-    <DashboardTransactionsCard />
-    <DashboardRevenueCard />
-    <!-- Add more dashboard components here as needed -->
+    <AppStats />
+    <AppTransactionsCard />
+    <AppRevenueCard />
+    <!-- Add more App components here as needed -->
   </div>
 </template>
 
 <script setup>
-import DashboardStats from '~/components/Dashboard/Stats.vue';
-import DashboardTransactionsCard from '~/components/Dashboard/TransactionsCard.vue';
-import DashboardRevenueCard from '~/components/Dashboard/RevenueCard.vue';
+import AppStats from '~/components/App/Stats.vue';
+import AppTransactionsCard from '~/components/App/TransactionsCard.vue';
+import AppRevenueCard from '~/components/App/RevenueCard.vue';
 
 // Add any necessary component logic here
 </script>
