@@ -31,7 +31,7 @@
         </ul>
       </div>
       <div class="navbar-end">
-        <a class="btn btn-primary btn-outline">Enter App</a>
+        <NuxtLink class="btn btn-primary btn-outline" to="/app">Enter App</NuxtLink>
       </div>
     </div>
 
