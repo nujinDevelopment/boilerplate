@@ -12,7 +12,7 @@
             </g>
           </g>
         </svg>
-        nujin
+        <h1 class="font-normal text-xl">nujin</h1>
       </NuxtLink>
       <ul class="menu">
         <li v-for="(item, index) in menuItems" :key="index">
