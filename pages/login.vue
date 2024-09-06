@@ -2,7 +2,9 @@
 const supabase = useSupabaseClient()
 const email = ref('')
 const password = ref('')
+const confirmPassword = ref('')
 const loginError = ref('')
+const register = ref(false)
 
 const signInWithEmail = async () => {
   loginError.value = ''
@@ -15,6 +17,25 @@ const signInWithEmail = async () => {
   } else {
     // Redirect to dashboard or home page
     navigateTo('/app')
+  }
+}
+
+const signUp = async () => {
+  loginError.value = ''
+  if (password.value !== confirmPassword.value) {
+    loginError.value = "Passwords don't match"
+    return
+  }
+  const { error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value,
+  })
+  if (error) {
+    loginError.value = error.message
+  } else {
+    // Show message to check email for confirmation
+    alert('Please check your email for the confirmation link')
+    register.value = false
   }
 }
 
@@ -39,8 +60,8 @@ const signInWithOtp = async () => {
   <div class="min-h-screen bg-base-200 flex items-center justify-center">
     <div class="card w-full max-w-sm shadow-2xl bg-base-100">
       <div class="card-body">
-        <h2 class="card-title text-center mb-8">Login</h2>
-        <form @submit.prevent="signInWithEmail">
+        <h2 class="card-title text-center mb-8">{{ register ? 'Register' : 'Login' }}</h2>
+        <form @submit.prevent="register ? signUp : signInWithEmail">
           <div class="form-control">
             <label class="label" for="email">
               <span class="label-text">Email</span>
@@ -67,17 +88,33 @@ const signInWithOtp = async () => {
               required
             />
           </div>
+          <div v-if="register" class="form-control mt-4">
+            <label class="label" for="confirmPassword">
+              <span class="label-text">Confirm Password</span>
+            </label>
+            <input
+              id="confirmPassword"
+              v-model="confirmPassword"
+              type="password"
+              placeholder="••••••••"
+              class="input input-bordered"
+              required
+            />
+          </div>
           <div v-if="loginError" class="text-error mt-4">{{ loginError }}</div>
           <div class="form-control mt-6">
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary">{{ register ? 'Register' : 'Login' }}</button>
           </div>
         </form>
         <div class="divider">OR</div>
-        <button @click="signInWithOtp" class="btn btn-outline btn-primary">
+        <button v-if="!register" @click="signInWithOtp" class="btn btn-outline btn-primary">
           Sign In with Magic Link
         </button>
-        <div class="text-center mt-4">
-          <a href="#" class="link link-hover">Forgot password?</a>
+        <div class="text-center mt-4 flex flex-col">
+          <a v-if="!register" href="#" class="link link-hover pr-2">Forgot password?</a>
+          <a @click="register = !register" class="link link-hover">
+            {{ register ? 'Already have an account? Login' : 'Don\'t have an account? Register' }}
+          </a>
         </div>
       </div>
     </div>

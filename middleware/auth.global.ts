@@ -7,7 +7,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (!user.value) {
       // Check if there's a session saved in the cookies
       const { data: { session } } = await supabase.auth.getSession()
-
+      console.log(session);
+      
       if (!session) {
         return navigateTo('/login')
       }

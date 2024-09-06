@@ -44,6 +44,6 @@ export default defineNuxtConfig({
 
   // Add this line to use the auth middleware globally
   routeRules: {
-    '/app/**': { middleware: ['auth'] }
+    // '/app/**': { middleware: ['auth'] }
   }
 })
