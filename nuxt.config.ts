@@ -40,5 +40,10 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/supabase',
     '@vite-pwa/nuxt'
-  ]
+  ],
+
+  // Add this line to use the auth middleware globally
+  routeRules: {
+    '/app/**': { middleware: ['auth'] }
+  }
 })

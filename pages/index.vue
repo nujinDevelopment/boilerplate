@@ -11,7 +11,7 @@
             dashboard.
           </p>
           <a
-            href="https://github.com/your-repo-link"
+            :href="repoLink"
             target="_blank"
             rel="noopener noreferrer"
             class="btn btn-primary"
@@ -80,7 +80,7 @@
           Get started with nujin today and accelerate your development process.
         </p>
         <a
-          href="https://github.com/your-repo-link"
+          :href="repoLink"
           target="_blank"
           rel="noopener noreferrer"
           class="btn btn-primary btn-lg"
@@ -94,6 +94,8 @@
 
 <script setup lang="ts">
 // Add any necessary imports or script logic here
+
+const repoLink = "https://github.com/nujinDevelopment/boilerplate"
 </script>
 
 <style scoped>
