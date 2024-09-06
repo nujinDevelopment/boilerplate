@@ -3,25 +3,25 @@
     <!-- Fixed Blurry Navbar -->
     <div class="navbar fixed top-0 z-50" :class="{ 'bg-base-100 bg-opacity-30 backdrop-blur-lg logo-visible': !isOnTop }">
       <div class="navbar-start">
-        <div class="flex justify-center w-full p-4" :class="{ 'hidden': isOnTop }">
-            <svg 
-              class="fill-base-content w-8 h-8 nujin-logo" 
-              data-aos="zoom-in"
-              version="1.1" 
-              xmlns="http://www.w3.org/2000/svg" 
-              viewBox="0 0 512 512" 
-              xmlns:xlink="http://www.w3.org/1999/xlink" 
-              enable-background="new 0 0 512 512"
-            >
+        <NuxtLink class="flex justify-center w-full p-4" :class="{ 'hidden': isOnTop }" to="/">
+          <svg 
+            class="fill-base-content w-8 h-8 nujin-logo" 
+            data-aos="zoom-in"
+            version="1.1" 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 512 512" 
+            xmlns:xlink="http://www.w3.org/1999/xlink" 
+            enable-background="new 0 0 512 512"
+          >
+            <g>
               <g>
-                <g>
-                  <path d="m365.5,191.5v-106.7c0-7.2-3.8-13.8-9.9-17.5l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.1-3.7 9.9-10.3 9.9-17.5z"/>
-                  <path d="m220,303l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0-7.2-3.7-13.8-9.9-17.5z"/>
-                  <path d="m491.1,302.9l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0.1-7.2-3.7-13.8-9.8-17.5z"/>
-                </g>
+                <path d="m365.5,191.5v-106.7c0-7.2-3.8-13.8-9.9-17.5l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.1-3.7 9.9-10.3 9.9-17.5z"/>
+                <path d="m220,303l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0-7.2-3.7-13.8-9.9-17.5z"/>
+                <path d="m491.1,302.9l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0.1-7.2-3.7-13.8-9.8-17.5z"/>
               </g>
-            </svg>
-          </div>
+            </g>
+          </svg>
+        </NuxtLink>
       </div>
       <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
