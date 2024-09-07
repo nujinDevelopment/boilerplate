@@ -11,6 +11,11 @@ const error = ref('')
 const successMessage = ref('')
 const loading = ref(false)
 
+// Add page meta data
+definePageMeta({
+  pageName: 'Profile Settings'
+});
+
 // Load user's email when component mounts
 onMounted(() => {
   if (user.value) {
@@ -52,8 +57,7 @@ const updateProfile = async () => {
 
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Profile Settings</h1>
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card bg-base-100 shadow-inner">
       <div class="card-body">
         <form @submit.prevent="updateProfile">
           <div class="form-control">

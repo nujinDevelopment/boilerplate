@@ -17,7 +17,7 @@ const logout = async () => {
 
 <template>
   <div class="dropdown-end dropdown z-10">
-    <div tabindex="0" class="avatar btn btn-circle btn-ghost">
+    <div tabindex="0" class="avatar btn btn-circle btn-ghost  m-4">
       <div class="w-10 rounded-full">
         <img src="https://picsum.photos/80/80?5" alt="User Avatar" />
       </div>

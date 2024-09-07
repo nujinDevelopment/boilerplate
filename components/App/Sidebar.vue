@@ -14,7 +14,7 @@
         </svg>
         <h1 class="font-normal text-xl">nujin</h1>
       </NuxtLink>
-      <ul class="menu">
+      <ul class="menu pt-16">
         <li v-for="(item, index) in menuItems" :key="index">
           <template v-if="item.subItems">
             <details>

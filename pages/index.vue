@@ -40,7 +40,7 @@
       <div class="hero-content text-center">
         <div class="max-w-md">
           <div class="flex justify-center w-full p-4">
-            <svg class="fill-base-content w-24 h-24 nujin-logo" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512"
+            <svg class="fill-base-content w-64 h-64 nujin-logo" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512"
             
               :class="{ 'logo-visible': !isOnTop }"
               data-aos="zoom-in">

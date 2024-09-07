@@ -3,6 +3,18 @@
     <AppStats />
     <AppTransactionsCard />
     <AppRevenueCard />
+    <AppStats />
+    <AppTransactionsCard />
+    <AppRevenueCard />
+    <AppStats />
+    <AppTransactionsCard />
+    <AppRevenueCard />
+    <AppStats />
+    <AppTransactionsCard />
+    <AppRevenueCard />
+    <AppStats />
+    <AppTransactionsCard />
+    <AppRevenueCard />
     <!-- Add more App components here as needed -->
   </div>
 </template>
@@ -11,6 +23,11 @@
 import AppStats from '~/components/App/Stats.vue';
 import AppTransactionsCard from '~/components/App/TransactionsCard.vue';
 import AppRevenueCard from '~/components/App/RevenueCard.vue';
+
+// Add page meta data
+definePageMeta({
+  pageName: 'Dashboard'
+});
 
 // Add any necessary component logic here
 </script>
