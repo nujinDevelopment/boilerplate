@@ -2,19 +2,7 @@
   <div class="grid grid-cols-12 grid-rows-[min-content] gap-y-12 p-4 lg:gap-x-12 ">
     <AppStats />
     <AppTransactionsCard />
-    <AppRevenueCard />
-    <AppStats />
-    <AppTransactionsCard />
-    <AppRevenueCard />
-    <AppStats />
-    <AppTransactionsCard />
-    <AppRevenueCard />
-    <AppStats />
-    <AppTransactionsCard />
-    <AppRevenueCard />
-    <AppStats />
-    <AppTransactionsCard />
-    <AppRevenueCard />
+    <AppRevenueCard />-
     <!-- Add more App components here as needed -->
   </div>
 </template>
