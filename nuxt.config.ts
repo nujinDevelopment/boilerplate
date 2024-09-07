@@ -39,11 +39,12 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxtjs/supabase',
-    '@vite-pwa/nuxt'
+    '@vite-pwa/nuxt',
+    '~/modules/user-management/module'
   ],
 
   // We'll handle the auth middleware in the auth.global.ts file
   routeRules: {
-    // '/app/**': { middleware: ['auth'] }
+    '/app/**': { middleware: ['auth'] }
   }
 })
