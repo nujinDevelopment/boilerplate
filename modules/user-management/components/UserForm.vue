@@ -22,12 +22,17 @@
             </label>
             <input v-model="form.name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Name">
           </div>
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between mb-4">
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
               {{ user ? 'Update' : 'Create' }}
             </button>
             <button @click="$emit('close')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
               Cancel
+            </button>
+          </div>
+          <div v-if="user" class="text-center">
+            <button @click.prevent="handleResetPassword" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              Reset Password
             </button>
           </div>
         </form>
@@ -49,7 +54,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
-const { createUser, updateUser } = useUsers()
+const { createUser, updateUser, resetPassword } = useUsers()
 
 const form = ref({
   email: '',
@@ -68,25 +73,40 @@ onMounted(() => {
 })
 
 const handleSubmit = async () => {
-  const userData = {
-    email: form.value.email,
-    password: form.value.password,
-    user_metadata: {
-      name: form.value.name
-    }
-  }
-
   try {
     if (props.user) {
-      userData.id = props.user.id
+      const userData = {
+        id: props.user.id,
+        email: form.value.email,
+        user_metadata: {
+          name: form.value.name
+        }
+      }
       await updateUser(userData)
     } else {
+      const userData = {
+        email: form.value.email,
+        password: form.value.password,
+        user_metadata: {
+          name: form.value.name
+        }
+      }
       await createUser(userData)
     }
     emit('close')
   } catch (error) {
     console.error('Error submitting user data:', error)
     // You might want to show an error message to the user here
+  }
+}
+
+const handleResetPassword = async () => {
+  try {
+    await resetPassword(props.user.id)
+    alert('Password reset email sent to the user.')
+  } catch (error) {
+    console.error('Error resetting password:', error)
+    alert('Failed to reset password. Please try again.')
   }
 }
 </script>

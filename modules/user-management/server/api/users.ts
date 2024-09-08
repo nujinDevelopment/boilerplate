@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody } from 'h3'
+import { defineEventHandler, readBody, createError } from 'h3'
 import { serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
@@ -17,30 +17,52 @@ export default defineEventHandler(async (event) => {
   if (event.req.method === 'POST') {
     const body = await readBody(event)
     console.log('Received user data:', body)
-    const { email, password, user_metadata } = body
-    try {
-      const { data, error } = await client.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata
-      })
+    const { email, password, user_metadata, action } = body
 
-      if (error) {
-        console.error('Error creating user:', error)
-        throw createError({ statusCode: 500, statusMessage: `Error creating user: ${error.message}` })
+    if (action === 'reset_password') {
+      try {
+        const { data, error } = await client.auth.admin.generateLink({
+          type: 'recovery',
+          userId: body.id,
+        })
+
+        if (error) {
+          console.error('Error generating password reset link:', error)
+          throw createError({ statusCode: 500, statusMessage: 'Error generating password reset link' })
+        }
+
+        // In a production environment, you would typically send this link to the user's email
+        // For this example, we'll just return it
+        return { resetLink: data.properties.action_link }
+      } catch (error) {
+        console.error('Unexpected error resetting password:', error)
+        throw createError({ statusCode: 500, statusMessage: `Unexpected error resetting password: ${error.message}` })
       }
-      return data.user
-    } catch (error) {
-      console.error('Unexpected error creating user:', error)
-      throw createError({ statusCode: 500, statusMessage: `Unexpected error creating user: ${error.message}` })
+    } else {
+      try {
+        const { data, error } = await client.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata
+        })
+
+        if (error) {
+          console.error('Error creating user:', error)
+          throw createError({ statusCode: 500, statusMessage: `Error creating user: ${error.message}` })
+        }
+        return data.user
+      } catch (error) {
+        console.error('Unexpected error creating user:', error)
+        throw createError({ statusCode: 500, statusMessage: `Unexpected error creating user: ${error.message}` })
+      }
     }
   }
 
   if (event.req.method === 'PUT') {
     const body = await readBody(event)
-    const { id, ...updateData } = body
-    const { data, error } = await client.auth.admin.updateUserById(id, updateData)
+    const { id, email, user_metadata } = body
+    const { data, error } = await client.auth.admin.updateUserById(id, { email, user_metadata })
 
     if (error) {
       console.error('Error updating user:', error)

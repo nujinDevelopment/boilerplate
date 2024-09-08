@@ -40,7 +40,13 @@ export const useUsers = () => {
     try {
       await $fetch('/api/users', {
         method: 'PUT',
-        body: userData
+        body: {
+          id: userData.id,
+          email: userData.email,
+          user_metadata: {
+            name: userData.user_metadata.name
+          }
+        }
       })
       await fetchUsers()
     } catch (err) {
@@ -63,6 +69,23 @@ export const useUsers = () => {
     }
   }
 
+  const resetPassword = async (userId) => {
+    error.value = null
+    try {
+      const response = await $fetch('/api/users', {
+        method: 'POST',
+        body: { id: userId, action: 'reset_password' }
+      })
+      console.log('Password reset link:', response.resetLink)
+      // In a production environment, you would typically send this link to the user's email
+      // For this example, we're just logging it to the console
+    } catch (err) {
+      console.error('Error resetting password:', err)
+      error.value = `Failed to reset password: ${err.message}`
+      throw err
+    }
+  }
+
   return {
     users,
     isLoading,
@@ -70,6 +93,7 @@ export const useUsers = () => {
     fetchUsers,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    resetPassword
   }
 }

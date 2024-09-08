@@ -1,7 +1,6 @@
 <template>
   <div class="container mx-auto p-4">
     <UserManagementUserList />
-    <UserManagementUserForm />
   </div>
 </template>
 
