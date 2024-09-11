@@ -1,48 +1,42 @@
 <template>
-  <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="my-modal">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-      <div class="mt-3 text-center">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">{{ user ? 'Edit User' : 'Create User' }}</h3>
-        <form @submit.prevent="handleSubmit" class="mt-2 text-left">
-          <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
-              Email
-            </label>
-            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" required>
-          </div>
-          <div class="mb-4" v-if="!user">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-              Password
-            </label>
-            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" required>
-          </div>
-          <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
-              Name
-            </label>
-            <input v-model="form.name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Name">
-          </div>
-          <div class="flex items-center justify-between mb-4">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-              {{ user ? 'Update' : 'Create' }}
-            </button>
-            <button @click="$emit('close')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-              Cancel
-            </button>
-          </div>
-          <div v-if="user" class="text-center">
-            <button @click.prevent="handleResetPassword" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-              Reset Password
-            </button>
-          </div>
-        </form>
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-2xl mb-4">{{ user ? 'Edit User' : 'Add User' }}</h2>
+      <form @submit.prevent="handleSubmit">
+        <div class="form-control w-full">
+          <label class="label" for="email">
+            <span class="label-text">Email</span>
+          </label>
+          <input v-model="form.email" type="email" id="email" placeholder="Email" class="input input-bordered w-full" required>
+        </div>
+        <div class="form-control w-full mt-4" v-if="!user">
+          <label class="label" for="password">
+            <span class="label-text">Password</span>
+          </label>
+          <input v-model="form.password" type="password" id="password" placeholder="Password" class="input input-bordered w-full" required>
+        </div>
+        <div class="form-control w-full mt-4">
+          <label class="label" for="name">
+            <span class="label-text">Name</span>
+          </label>
+          <input v-model="form.name" type="text" id="name" placeholder="Name" class="input input-bordered w-full">
+        </div>
+        <div class="card-actions justify-end mt-6">
+          <button type="submit" class="btn btn-primary">{{ user ? 'Update' : 'Create' }}</button>
+          <button @click="handleCancel" type="button" class="btn">Cancel</button>
+        </div>
+      </form>
+      <div v-if="user" class="mt-6">
+        <button @click.prevent="handleResetPassword" class="btn btn-warning btn-block">
+          Reset Password
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useUsers } from '../composables/useUsers'
 
 const props = defineProps({
@@ -52,7 +46,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['user-updated', 'user-created', 'cancel'])
 
 const { createUser, updateUser, resetPassword } = useUsers()
 
@@ -62,15 +56,25 @@ const form = ref({
   name: ''
 })
 
-onMounted(() => {
-  if (props.user) {
-    form.value = {
-      ...form.value,
-      ...props.user,
-      ...props.user.user_metadata
-    }
+const resetForm = () => {
+  form.value = {
+    email: '',
+    password: '',
+    name: ''
   }
-})
+}
+
+watch(() => props.user, (newUser) => {
+  if (newUser) {
+    form.value = {
+      email: newUser.email,
+      password: '',
+      name: newUser.user_metadata?.name || ''
+    }
+  } else {
+    resetForm()
+  }
+}, { immediate: true })
 
 const handleSubmit = async () => {
   try {
@@ -83,6 +87,7 @@ const handleSubmit = async () => {
         }
       }
       await updateUser(userData)
+      emit('user-updated')
     } else {
       const userData = {
         email: form.value.email,
@@ -92,8 +97,9 @@ const handleSubmit = async () => {
         }
       }
       await createUser(userData)
+      emit('user-created')
     }
-    emit('close')
+    resetForm()
   } catch (error) {
     console.error('Error submitting user data:', error)
     // You might want to show an error message to the user here
@@ -111,5 +117,10 @@ const handleResetPassword = async () => {
     console.error('Error resetting password:', error)
     alert('Failed to reset password. Please try again.')
   }
+}
+
+const handleCancel = () => {
+  resetForm()
+  emit('cancel')
 }
 </script>

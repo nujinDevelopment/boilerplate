@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 export const useUsers = () => {
   const users = ref([])
@@ -85,6 +85,10 @@ export const useUsers = () => {
       throw err
     }
   }
+
+  onMounted(() => {
+    fetchUsers()
+  })
 
   return {
     users,

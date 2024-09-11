@@ -55,7 +55,7 @@ const IconUser = defineComponent({
   )
 });
 
-const IconProducts = defineComponent({
+const IconProject = defineComponent({
   render: () => h('svg', { xmlns: "http://www.w3.org/2000/svg", class: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" },
     [h('path', { d: "M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" })]
   )
@@ -67,9 +67,9 @@ const menuItems = [
   { label: 'Dashboard', icon: IconHome, to: '/app/' },
   { label: 'Users', icon: IconUser, to: '/app/users' },
   { 
-    label: 'Products', 
-    icon: IconProducts,
-    subItems: ['All Products', 'Add New', 'Categories', 'Tags', 'Reports', 'Archive']
+    label: 'Projects', 
+    icon: IconProject,
+    subItems: ['All Projects', 'Add New', 'Categories', 'Tags', 'Reports', 'Archive']
   },
   // Add more menu items here
 ];
