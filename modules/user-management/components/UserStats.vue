@@ -26,11 +26,10 @@ const { users, isLoading, error, fetchUsers } = useUsers();
 
 // Add a watch to log when users change
 watch(users, (newUsers) => {
-  console.log('Users updated:', newUsers);
+  // console.log('Users updated:', newUsers);
 });
 
 const userStats = computed(() => {
-  console.log('Calculating user stats. Total users:', users.value.length);
   return [
     {
       title: 'Total Users',

@@ -1,15 +1,19 @@
 <template>
   <div class="p-4">
-    <UserManagementUserStats class="mb-6" />
+    <UserManagementUserStats v-if="showStats" class="mb-6" />
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2">
-        <UserManagementUserList :users="users" @edit-user="editUser" />
+        <UserManagementUserList 
+          :users="users" 
+          @edit-user="editUser" 
+          @user-deleted="handleUserChange"
+        />
       </div>
       <div>
         <UserManagementUserForm
           :user="selectedUser"
           @user-updated="handleUserUpdated"
-          @user-created="handleUserCreated"
+          @user-created="handleUserChange"
           @cancel="handleCancel"
         />
       </div>
@@ -31,6 +35,7 @@ definePageMeta({
 
 const selectedUser = ref(null);
 const { users, fetchUsers } = useUsers();
+const showStats = ref(true);
 
 const editUser = (user) => {
   selectedUser.value = user;
@@ -39,10 +44,15 @@ const editUser = (user) => {
 const handleUserUpdated = async () => {
   selectedUser.value = null;
   await fetchUsers();
+  handleUserChange();
 };
 
-const handleUserCreated = async () => {
+const handleUserChange = async () => {
   await fetchUsers();
+  showStats.value = false;
+  setTimeout(() => {
+    showStats.value = true;
+  }, 0);
 };
 
 const handleCancel = () => {
