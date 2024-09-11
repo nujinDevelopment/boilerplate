@@ -69,12 +69,12 @@ export const useUsers = () => {
     }
   }
 
-  const resetPassword = async (userId) => {
+  const resetPassword = async (user) => {
     error.value = null
     try {
       const response = await $fetch('/api/users', {
         method: 'POST',
-        body: { id: userId, action: 'reset_password' }
+        body: { id: user.id, email: user.email, action: 'reset_password' }
       })
       console.log('Password reset link:', response.resetLink)
       // In a production environment, you would typically send this link to the user's email

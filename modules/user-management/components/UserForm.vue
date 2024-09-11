@@ -102,7 +102,10 @@ const handleSubmit = async () => {
 
 const handleResetPassword = async () => {
   try {
-    await resetPassword(props.user.id)
+    await resetPassword({
+      id: props.user.id,
+      email: form.value.email
+    })
     alert('Password reset email sent to the user.')
   } catch (error) {
     console.error('Error resetting password:', error)

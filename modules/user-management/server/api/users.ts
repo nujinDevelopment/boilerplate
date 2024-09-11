@@ -21,16 +21,24 @@ export default defineEventHandler(async (event) => {
 
     if (action === 'reset_password') {
       try {
+        console.log('Attempting to reset password for user ID:', body.id)
+        
         const { data, error } = await client.auth.admin.generateLink({
           type: 'recovery',
-          userId: body.id,
+          email: body.email, // Add email parameter
         })
 
         if (error) {
           console.error('Error generating password reset link:', error)
-          throw createError({ statusCode: 500, statusMessage: 'Error generating password reset link' })
+          throw createError({ statusCode: 500, statusMessage: `Error generating password reset link: ${error.message}` })
         }
 
+        if (!data || !data.properties || !data.properties.action_link) {
+          console.error('Invalid response from generateLink:', data)
+          throw createError({ statusCode: 500, statusMessage: 'Invalid response when generating password reset link' })
+        }
+
+        console.log('Successfully generated password reset link')
         // In a production environment, you would typically send this link to the user's email
         // For this example, we'll just return it
         return { resetLink: data.properties.action_link }
