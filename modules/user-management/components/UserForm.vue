@@ -2,12 +2,13 @@
   <div class="card bg-base-100 shadow">
     <div class="card-body">
       <h2 class="card-title text-2xl mb-4">{{ user ? 'Edit User' : 'Add User' }}</h2>
+      <div v-if="error" class="alert alert-error mb-4">{{ error }}</div>
       <form @submit.prevent="handleSubmit">
         <div class="form-control w-full">
           <label class="label" for="email">
             <span class="label-text">Email</span>
           </label>
-          <input v-model="form.email" type="email" id="email" placeholder="Email" class="input input-bordered w-full" required>
+          <input v-model="form.email" type="email" id="email" placeholder="Email" class="input input-bordered w-full" required :disabled="!canEditEmail">
         </div>
         <div class="form-control w-full mt-4" v-if="!user">
           <label class="label" for="password">
@@ -25,19 +26,17 @@
           <label class="label" for="role">
             <span class="label-text">Role</span>
           </label>
-          <select v-model="form.role" id="role" class="input input-bordered select select-bordered w-full" required>
+          <select v-model="form.role" id="role" class="input input-bordered select select-bordered w-full" required :disabled="!canChangeRole">
             <option value="" disabled>Select a role</option>
-            <option value="admin">Admin</option>
-            <option value="manager">Manager</option>
-            <option value="user">User</option>
+            <option v-for="role in availableRoles" :key="role" :value="role">{{ capitalizeFirstLetter(role) }}</option>
           </select>
         </div>
         <div class="card-actions justify-end mt-6">
-          <button type="submit" class="btn btn-primary">{{ user ? 'Update' : 'Create' }}</button>
+          <button type="submit" class="btn btn-primary" :disabled="!canSubmit">{{ user ? 'Update' : 'Create' }}</button>
           <button @click="handleCancel" type="button" class="btn">Cancel</button>
         </div>
       </form>
-      <div v-if="user" class="mt-6">
+      <div v-if="user && canResetPassword" class="mt-6">
         <button @click.prevent="handleResetPassword" class="btn btn-warning btn-block">
           Reset Password
         </button>
@@ -47,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useUsers } from '../composables/useUsers'
 
 const props = defineProps({
@@ -59,7 +58,7 @@ const props = defineProps({
 
 const emit = defineEmits(['user-updated', 'user-created', 'cancel'])
 
-const { createUser, updateUser, resetPassword } = useUsers()
+const { createUser, updateUser, resetPassword, getCurrentUserRole, error } = useUsers()
 
 const form = ref({
   email: '',
@@ -67,6 +66,8 @@ const form = ref({
   name: '',
   role: ''
 })
+
+const currentUserRole = computed(() => getCurrentUserRole())
 
 const resetForm = () => {
   form.value = {
@@ -89,6 +90,21 @@ watch(() => props.user, (newUser) => {
     resetForm()
   }
 }, { immediate: true })
+
+const canEditEmail = computed(() => !props.user || currentUserRole.value === 'admin')
+const canChangeRole = computed(() => {
+  if (currentUserRole.value === 'admin') return true
+  if (currentUserRole.value === 'manager' && (!props.user || props.user.user_metadata?.role !== 'admin')) return true
+  return false
+})
+const canResetPassword = computed(() => currentUserRole.value === 'admin' || currentUserRole.value === 'manager')
+const canSubmit = computed(() => currentUserRole.value === 'admin' || (currentUserRole.value === 'manager' && (!props.user || props.user.user_metadata?.role !== 'admin')))
+
+const availableRoles = computed(() => {
+  if (currentUserRole.value === 'admin') return ['admin', 'manager', 'user']
+  if (currentUserRole.value === 'manager') return ['manager', 'user']
+  return ['user']
+})
 
 const handleSubmit = async () => {
   try {
@@ -118,7 +134,7 @@ const handleSubmit = async () => {
     resetForm()
   } catch (error) {
     console.error('Error submitting user data:', error)
-    // You might want to show an error message to the user here
+    // Error is now handled in the useUsers composable
   }
 }
 
@@ -131,12 +147,17 @@ const handleResetPassword = async () => {
     alert('Password reset email sent to the user.')
   } catch (error) {
     console.error('Error resetting password:', error)
-    alert('Failed to reset password. Please try again.')
+    // Error is now handled in the useUsers composable
   }
 }
 
 const handleCancel = () => {
   resetForm()
   emit('cancel')
+}
+
+const capitalizeFirstLetter = (string: string) => {
+  if (!string) return ''
+  return string.charAt(0).toUpperCase() + string.slice(1)
 }
 </script>

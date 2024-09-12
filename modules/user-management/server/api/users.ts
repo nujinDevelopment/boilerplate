@@ -1,12 +1,38 @@
 import { defineEventHandler, readBody, getQuery, createError } from 'h3'
-import { serverSupabaseServiceRole } from '#supabase/server'
+import { serverSupabaseServiceRole, serverSupabaseUser } from '#supabase/server'
 
 const ROLES = ['admin', 'manager', 'user']
 
+const ROLE_PERMISSIONS = {
+  GET: ['admin', 'manager'],
+  POST: ['admin'],
+  PUT: ['admin'],
+  DELETE: ['admin']
+}
+
+const checkUserRole = (userRole, allowedRoles) => {
+  return allowedRoles.includes(userRole)
+}
+
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseServiceRole(event)
+  const user = await serverSupabaseUser(event)
+
+  if (!user) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  }
+
+  const userRole = user.user_metadata?.role
+
+  if (!userRole || !ROLES.includes(userRole)) {
+    throw createError({ statusCode: 403, statusMessage: 'Invalid user role' })
+  }
 
   if (event.req.method === 'GET') {
+    if (!checkUserRole(userRole, ROLE_PERMISSIONS.GET)) {
+      throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+    }
+
     const query = getQuery(event)
     const { email, name, role, page = 1, pageSize = 10 } = query
 
@@ -51,6 +77,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (event.req.method === 'POST') {
+    if (!checkUserRole(userRole, ROLE_PERMISSIONS.POST)) {
+      throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+    }
+
     const body = await readBody(event)
     console.log('Received user data:', body)
     const { email, password, user_metadata, action, role } = body
@@ -109,6 +139,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (event.req.method === 'PUT') {
+    if (!checkUserRole(userRole, ROLE_PERMISSIONS.PUT)) {
+      throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+    }
+
     const body = await readBody(event)
     console.log('Received update user data:', body)
     const { id, email, user_metadata, role } = body
@@ -130,6 +164,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (event.req.method === 'DELETE') {
+    if (!checkUserRole(userRole, ROLE_PERMISSIONS.DELETE)) {
+      throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+    }
+
     const body = await readBody(event)
     const { id } = body
     console.log('Attempting to delete user with ID:', id)

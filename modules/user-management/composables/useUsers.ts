@@ -1,4 +1,5 @@
 import { ref, reactive } from 'vue'
+import { useSupabaseUser } from '#imports'
 
 export const useUsers = () => {
   const users = ref([])
@@ -17,6 +18,21 @@ export const useUsers = () => {
     pageSize: 10
   })
 
+  const getCurrentUserRole = () => {
+    const user = useSupabaseUser()
+    return user.value?.user_metadata?.role || null
+  }
+
+  const handleApiError = (err) => {
+    console.error('API Error:', err)
+    if (err.response?.status === 403) {
+      error.value = 'You do not have permission to perform this action.'
+    } else {
+      error.value = `An error occurred: ${err.message}`
+    }
+    throw err
+  }
+
   const fetchUsers = async () => {
     isLoading.value = true
     error.value = null
@@ -31,8 +47,7 @@ export const useUsers = () => {
       users.value = data
       totalUsers.value = total
     } catch (err) {
-      console.error('Error fetching users:', err)
-      error.value = `Failed to fetch users: ${err.message}`
+      handleApiError(err)
     } finally {
       isLoading.value = false
     }
@@ -67,22 +82,21 @@ export const useUsers = () => {
           user_metadata: {
             name: userData.user_metadata.name,
           },
-          role: userData.user_metadata.role // Send role as a separate field
+          role: userData.user_metadata.role
         }
       })
       console.log('User created:', newUser)
       await fetchUsers()
+      return newUser
     } catch (err) {
-      console.error('Error creating user:', err)
-      error.value = `Failed to create user: ${err.message}`
-      throw err
+      handleApiError(err)
     }
   }
 
   const updateUser = async (userData) => {
     error.value = null
     try {
-      await $fetch('/api/users', {
+      const updatedUser = await $fetch('/api/users', {
         method: 'PUT',
         body: {
           id: userData.id,
@@ -94,10 +108,9 @@ export const useUsers = () => {
         }
       })
       await fetchUsers()
+      return updatedUser
     } catch (err) {
-      console.error('Error updating user:', err)
-      error.value = `Failed to update user: ${err.message}`
-      throw err
+      handleApiError(err)
     }
   }
 
@@ -110,8 +123,7 @@ export const useUsers = () => {
       })
       await fetchUsers()
     } catch (err) {
-      console.error('Error deleting user:', err)
-      error.value = `Failed to delete user: ${err.message}`
+      handleApiError(err)
     }
   }
 
@@ -125,10 +137,9 @@ export const useUsers = () => {
       console.log('Password reset link:', response.resetLink)
       // In a production environment, you would typically send this link to the user's email
       // For this example, we're just logging it to the console
+      return response.resetLink
     } catch (err) {
-      console.error('Error resetting password:', err)
-      error.value = `Failed to reset password: ${err.message}`
-      throw err
+      handleApiError(err)
     }
   }
 
@@ -146,6 +157,7 @@ export const useUsers = () => {
     createUser,
     updateUser,
     deleteUser,
-    resetPassword
+    resetPassword,
+    getCurrentUserRole
   }
 }

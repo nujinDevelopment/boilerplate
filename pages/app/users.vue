@@ -1,24 +1,33 @@
 <template>
   <div class="p-4">
-    <UserManagementUserStats v-if="showStats" class="mb-6" />
+    <h1 class="text-2xl font-bold mb-6">User Management</h1>
+    <div v-if="error" class="alert alert-error mb-6">{{ error }}</div>
+    <UserManagementUserStats v-if="showStats && canViewStats" class="mb-6" />
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
       <div class="xl:col-span-2">
         <UserManagementUserList @edit-user="editUser" />
       </div>
       <div>
         <UserManagementUserForm
+          v-if="canCreateOrEditUsers"
           :user="selectedUser"
           @user-updated="handleUserUpdated"
           @user-created="handleUserChange"
           @cancel="handleCancel"
         />
+        <div v-else class="card bg-base-100 shadow">
+          <div class="card-body">
+            <h2 class="card-title text-2xl mb-4">User Management</h2>
+            <p>You don't have permission to create or edit users.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useUsers } from '~/modules/user-management/composables/useUsers';
 import UserManagementUserStats from '~/modules/user-management/components/UserStats.vue';
 import UserManagementUserList from '~/modules/user-management/components/UserList.vue';
@@ -29,13 +38,19 @@ definePageMeta({
   pageName: 'User Management'
 });
 
-// This page manages users with role-based access control (admin, manager, user)
 const selectedUser = ref(null);
-const { fetchUsers } = useUsers();
+const { fetchUsers, getCurrentUserRole, error } = useUsers();
 const showStats = ref(true);
 
+const currentUserRole = computed(() => getCurrentUserRole());
+
+const canViewStats = computed(() => ['admin', 'manager'].includes(currentUserRole.value));
+const canCreateOrEditUsers = computed(() => ['admin', 'manager'].includes(currentUserRole.value));
+
 const editUser = (user) => {
-  selectedUser.value = user;
+  if (canCreateOrEditUsers.value) {
+    selectedUser.value = user;
+  }
 };
 
 const handleUserUpdated = async () => {
@@ -56,4 +71,7 @@ const handleUserChange = async () => {
 const handleCancel = () => {
   selectedUser.value = null;
 };
+
+// Fetch users when the component is mounted
+fetchUsers();
 </script>

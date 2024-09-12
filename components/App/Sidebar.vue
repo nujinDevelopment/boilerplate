@@ -41,7 +41,8 @@
 
 <script setup>
 import { defineComponent, h, computed } from 'vue';
-import { useRoute, useSupabaseUser } from '#imports';
+import { useRoute } from '#imports';
+import { useUsers } from '~/modules/user-management/composables/useUsers';
 
 const IconHome = defineComponent({
   render: () => h('svg', { xmlns: "http://www.w3.org/2000/svg", class: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" },
@@ -68,7 +69,7 @@ const IconSettings = defineComponent({
 });
 
 const route = useRoute();
-const user = useSupabaseUser();
+const { getCurrentUserRole } = useUsers();
 
 const menuItems = [
   { label: 'Dashboard', icon: IconHome, to: '/app/', roles: ['admin', 'manager', 'user'] },
@@ -83,7 +84,7 @@ const menuItems = [
 ];
 
 const filteredMenuItems = computed(() => {
-  const userRole = user.value?.user_metadata?.role || 'user';
+  const userRole = getCurrentUserRole();
   return menuItems.filter(item => item.roles.includes(userRole));
 });
 

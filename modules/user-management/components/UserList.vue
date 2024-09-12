@@ -60,10 +60,10 @@
               <td class="hidden lg:table-cell">{{ user.last_sign_in_at ? formatDate(user.last_sign_in_at) : 'Never' }}</td>
               <td>
                 <div class="flex space-x-2">
-                  <button @click="$emit('edit-user', user)" class="btn btn-sm btn-info">
+                  <button @click="$emit('edit-user', user)" class="btn btn-sm btn-info" :disabled="!canEditUser(user)">
                     Edit
                   </button>
-                  <button @click="openDeleteModal(user)" class="btn btn-sm btn-error">
+                  <button @click="openDeleteModal(user)" class="btn btn-sm btn-error" :disabled="!canDeleteUser(user)">
                     Delete
                   </button>
                 </div>
@@ -110,7 +110,7 @@ import { ref, computed, watch } from 'vue'
 import { useUsers } from '../composables/useUsers'
 import debounce from 'lodash/debounce'
 
-const { users, isLoading, error, filters, pagination, totalUsers, fetchUsers, setFilters, setPage, setPageSize, deleteUser } = useUsers()
+const { users, isLoading, error, filters, pagination, totalUsers, fetchUsers, setFilters, setPage, setPageSize, deleteUser, getCurrentUserRole } = useUsers()
 
 const emit = defineEmits(['edit-user', 'user-deleted'])
 
@@ -147,7 +147,7 @@ const confirmDelete = async () => {
       emit('user-deleted')
     } catch (err) {
       console.error('Error deleting user:', err)
-      // Optionally, you can set an error message here to display to the user
+      // Error is now handled in the useUsers composable
     } finally {
       const modal = document.getElementById('delete_modal') as HTMLDialogElement
       modal.close()
@@ -163,6 +163,16 @@ const formatDate = (dateString: string) => {
 const capitalizeFirstLetter = (string: string) => {
   if (!string) return ''
   return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+const canEditUser = (user: any) => {
+  const currentUserRole = getCurrentUserRole()
+  return currentUserRole === 'admin' || (currentUserRole === 'manager' && user.user_metadata?.role !== 'admin')
+}
+
+const canDeleteUser = (user: any) => {
+  const currentUserRole = getCurrentUserRole()
+  return currentUserRole === 'admin'
 }
 
 // Fetch users when the component is mounted
