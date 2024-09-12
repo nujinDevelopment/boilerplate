@@ -13,6 +13,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const roleRequirements = {
     '/app/users': ['admin', 'manager'],
     '/api/users': ['admin', 'manager'],
+    '/app/logs': ['admin'], // Add logs page with admin-only access
+    '/api/logs': ['admin'], // Add logs API route with admin-only access
     // Add more routes and their role requirements here
   }
 

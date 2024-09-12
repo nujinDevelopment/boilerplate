@@ -68,6 +68,12 @@ const IconSettings = defineComponent({
   )
 });
 
+const IconLogs = defineComponent({
+  render: () => h('svg', { xmlns: "http://www.w3.org/2000/svg", class: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" },
+    [h('path', { 'fill-rule': "evenodd", d: "M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v7h-2V7H7v5H5V5z", 'clip-rule': "evenodd" })]
+  )
+});
+
 const route = useRoute();
 const { getCurrentUserRole } = useUsers();
 
@@ -81,6 +87,7 @@ const menuItems = [
     roles: ['admin', 'manager', 'user']
   },
   { label: 'Settings', icon: IconSettings, to: '/app/settings', roles: ['admin', 'manager', 'user'] },
+  { label: 'Logs', icon: IconLogs, to: '/app/logs', roles: ['admin'] },
 ];
 
 const filteredMenuItems = computed(() => {

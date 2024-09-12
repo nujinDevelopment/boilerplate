@@ -40,11 +40,17 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/supabase',
     '@vite-pwa/nuxt',
-    '~/modules/user-management/module'
+    '~/modules/user-management/module',
+    '~/modules/logging/module'  // Add the new logging module
   ],
 
   // We'll handle the auth middleware in the auth.global.ts file
   routeRules: {
     '/app/**': { middleware: ['auth'] }
+  },
+
+  // Configuration for the logging module
+  logging: {
+    // Add any specific configuration for the logging module if needed
   }
 })
