@@ -1,13 +1,9 @@
 <template>
   <div class="p-4">
     <UserManagementUserStats v-if="showStats" class="mb-6" />
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-2">
-        <UserManagementUserList 
-          :users="users" 
-          @edit-user="editUser" 
-          @user-deleted="handleUserChange"
-        />
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div class="xl:col-span-2">
+        <UserManagementUserList @edit-user="editUser" />
       </div>
       <div>
         <UserManagementUserForm
@@ -22,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useUsers } from '~/modules/user-management/composables/useUsers';
 import UserManagementUserStats from '~/modules/user-management/components/UserStats.vue';
 import UserManagementUserList from '~/modules/user-management/components/UserList.vue';
@@ -33,8 +29,9 @@ definePageMeta({
   pageName: 'User Management'
 });
 
+// This page manages users with role-based access control (admin, manager, user)
 const selectedUser = ref(null);
-const { users, fetchUsers } = useUsers();
+const { fetchUsers } = useUsers();
 const showStats = ref(true);
 
 const editUser = (user) => {
@@ -49,6 +46,7 @@ const handleUserUpdated = async () => {
 
 const handleUserChange = async () => {
   await fetchUsers();
+  // Refresh stats by toggling showStats
   showStats.value = false;
   setTimeout(() => {
     showStats.value = true;
@@ -58,9 +56,4 @@ const handleUserChange = async () => {
 const handleCancel = () => {
   selectedUser.value = null;
 };
-
-onMounted(async () => {
-  console.log('Users page mounted, fetching users...');
-  await fetchUsers();
-});
 </script>

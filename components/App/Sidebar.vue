@@ -15,7 +15,7 @@
         <h1 class="font-normal text-xl">nujin</h1>
       </NuxtLink>
       <ul class="menu pt-16">
-        <li v-for="(item, index) in menuItems" :key="index">
+        <li v-for="(item, index) in filteredMenuItems" :key="index">
           <template v-if="item.subItems">
             <details>
               <summary>
@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { defineComponent, h } from 'vue';
+import { defineComponent, h, computed } from 'vue';
 import { useRoute } from '#imports';
 
 const IconHome = defineComponent({
@@ -61,18 +61,32 @@ const IconProject = defineComponent({
   )
 });
 
+const IconSettings = defineComponent({
+  render: () => h('svg', { xmlns: "http://www.w3.org/2000/svg", class: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" },
+    [h('path', { 'fill-rule': "evenodd", d: "M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z", 'clip-rule': "evenodd" })]
+  )
+});
+
 const route = useRoute();
 
+// Simulating user role - replace this with actual user role logic
+const userRole = 'admin'; // Can be 'admin', 'manager', or 'user'
+
 const menuItems = [
-  { label: 'Dashboard', icon: IconHome, to: '/app/' },
-  { label: 'Users', icon: IconUser, to: '/app/users' },
+  { label: 'Dashboard', icon: IconHome, to: '/app/', roles: ['admin', 'manager', 'user'] },
+  { label: 'Users', icon: IconUser, to: '/app/users', roles: ['admin', 'manager'] },
   { 
     label: 'Projects', 
     icon: IconProject,
-    subItems: ['All Projects', 'Add New', 'Categories', 'Tags', 'Reports', 'Archive']
+    subItems: ['All Projects', 'Add New', 'Categories', 'Tags', 'Reports', 'Archive'],
+    roles: ['admin', 'manager', 'user']
   },
-  // Add more menu items here
+  { label: 'Settings', icon: IconSettings, to: '/app/settings', roles: ['admin', 'manager', 'user'] },
 ];
+
+const filteredMenuItems = computed(() => {
+  return menuItems.filter(item => item.roles.includes(userRole));
+});
 
 const isActive = (item) => {
   if (item.to === route.path) {

@@ -30,6 +30,18 @@ watch(users, (newUsers) => {
 });
 
 const userStats = computed(() => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const roleStats = {
+    admin: users.value.filter(user => user.user_metadata?.role === 'admin').length,
+    manager: users.value.filter(user => user.user_metadata?.role === 'manager').length,
+    user: users.value.filter(user => user.user_metadata?.role === 'user').length,
+  };
+
   return [
     {
       title: 'Total Users',
@@ -38,21 +50,28 @@ const userStats = computed(() => {
     },
     {
       title: 'New Users (Last 30 Days)',
-      value: users.value.filter(user => {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        return new Date(user.created_at) > thirtyDaysAgo;
-      }).length,
+      value: users.value.filter(user => new Date(user.created_at) > thirtyDaysAgo).length,
       description: 'Users created in the last month'
     },
     {
       title: 'Active Users (Last 7 Days)',
-      value: users.value.filter(user => {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        return new Date(user.last_sign_in_at) > sevenDaysAgo;
-      }).length,
+      value: users.value.filter(user => new Date(user.last_sign_in_at) > sevenDaysAgo).length,
       description: 'Users who signed in recently'
+    },
+    {
+      title: 'Admin Users',
+      value: roleStats.admin,
+      description: 'Users with admin role'
+    },
+    {
+      title: 'Manager Users',
+      value: roleStats.manager,
+      description: 'Users with manager role'
+    },
+    {
+      title: 'Regular Users',
+      value: roleStats.user,
+      description: 'Users with regular user role'
     }
   ];
 });

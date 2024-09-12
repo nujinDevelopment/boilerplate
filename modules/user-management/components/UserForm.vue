@@ -21,6 +21,17 @@
           </label>
           <input v-model="form.name" type="text" id="name" placeholder="Name" class="input input-bordered w-full">
         </div>
+        <div class="form-control w-full mt-4">
+          <label class="label" for="role">
+            <span class="label-text">Role</span>
+          </label>
+          <select v-model="form.role" id="role" class="input input-bordered select select-bordered w-full" required>
+            <option value="" disabled>Select a role</option>
+            <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
+            <option value="user">User</option>
+          </select>
+        </div>
         <div class="card-actions justify-end mt-6">
           <button type="submit" class="btn btn-primary">{{ user ? 'Update' : 'Create' }}</button>
           <button @click="handleCancel" type="button" class="btn">Cancel</button>
@@ -53,14 +64,16 @@ const { createUser, updateUser, resetPassword } = useUsers()
 const form = ref({
   email: '',
   password: '',
-  name: ''
+  name: '',
+  role: ''
 })
 
 const resetForm = () => {
   form.value = {
     email: '',
     password: '',
-    name: ''
+    name: '',
+    role: ''
   }
 }
 
@@ -69,7 +82,8 @@ watch(() => props.user, (newUser) => {
     form.value = {
       email: newUser.email,
       password: '',
-      name: newUser.user_metadata?.name || ''
+      name: newUser.user_metadata?.name || '',
+      role: newUser.user_metadata?.role || ''
     }
   } else {
     resetForm()
@@ -83,7 +97,8 @@ const handleSubmit = async () => {
         id: props.user.id,
         email: form.value.email,
         user_metadata: {
-          name: form.value.name
+          name: form.value.name,
+          role: form.value.role
         }
       }
       await updateUser(userData)
@@ -93,7 +108,8 @@ const handleSubmit = async () => {
         email: form.value.email,
         password: form.value.password,
         user_metadata: {
-          name: form.value.name
+          name: form.value.name,
+          role: form.value.role
         }
       }
       await createUser(userData)
