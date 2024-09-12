@@ -1,57 +1,94 @@
-import { createClient } from '@supabase/supabase-js'
-import { defineEventHandler, readBody, getQuery } from 'h3'
+import { createRouter, defineEventHandler, useBody } from 'h3'
+import { z } from 'zod'
+import { prisma } from '@/server/database/client'
+import { useLogger } from '@/modules/logging/composables/useLogger'
 
-const supabase = createClient(
-  process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_KEY as string
-)
+const router = createRouter()
+const logger = useLogger()
 
-export default defineEventHandler(async (event) => {
-  if (event.node.req.method === 'GET') {
-    const query = getQuery(event)
-    const { page = 1, itemsPerPage = 10, level, category } = query
+const LogInputSchema = z.object({
+  message: z.string().min(1),
+  level: z.enum(['info', 'warn', 'error', 'debug']),
+  category: z.string().min(1),
+  metadata: z.record(z.unknown()).optional()
+})
 
-    let supabaseQuery = supabase
-      .from('logs')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range((Number(page) - 1) * Number(itemsPerPage), Number(page) * Number(itemsPerPage) - 1)
+router.post('/', async (event) => {
+  try {
+    logger.info('Incoming POST request to /api/logs', 'api/logs')
+    
+    const body = await useBody(event)
+    const result = LogInputSchema.safeParse(body)
 
-    if (level) {
-      supabaseQuery = supabaseQuery.eq('level', level)
+    if (!result.success) {
+      const issues = JSON.stringify(result.error.issues) 
+      logger.warn(`Invalid log input: ${issues}`, 'api/logs/validation')
+      throw new Error('Invalid log input')
     }
+    
+    logger.debug('Log input passed validation', 'api/logs/validation')
 
-    if (category) {
-      supabaseQuery = supabaseQuery.eq('category', category)
-    }
+    const log = await prisma.log.create({
+      data: {
+        message: result.data.message,
+        level: result.data.level, 
+        category: result.data.category,
+        metadata: result.data.metadata || {},
+      }
+    })
 
-    const { data, error, count } = await supabaseQuery
+    logger.info(`Log created successfully: ${log.id}`, 'api/logs/create', { log })
 
-    if (error) {
-      console.error('Error fetching logs:', error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data, total: count }
-  } else if (event.node.req.method === 'POST') {
-    const body = await readBody(event)
-    const { message, level, category, metadata } = body
-
-    const { data, error } = await supabase
-      .from('logs')
-      .insert({
-        message,
-        level,
-        category,
-        metadata,
-        created_at: new Date().toISOString()
-      })
-
-    if (error) {
-      console.error('Error inserting log:', error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
+    return log
+  } catch (err) {
+    logger.error(`Error in POST /api/logs: ${err}`, 'api/logs/error', { error: err }) 
+    throw err
   }
+})
+
+// API handler for fetching logs with pagination and filtering
+router.get('/', async (event) => {
+  try {
+    logger.info('Incoming GET request to /api/logs', 'api/logs')
+
+    const query = useQuery(event)
+
+    const page = parseInt(query.page as string) || 1
+    const pageSize = parseInt(query.pageSize as string) || 10
+    const level = query.level as string 
+    const category = query.category as string
+
+    const where: any = {}
+    if (level) where.level = level
+    if (category) where.category = category
+
+    logger.debug(`Fetching logs with filters: ${JSON.stringify(where)}`, 'api/logs/fetch')
+
+    const totalCount = await prisma.log.count({ where })
+  
+    const logs = await prisma.log.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,  
+    })
+  
+    const response = {
+      logs, 
+      totalCount,
+      page, 
+      pageSize
+    }
+
+    logger.info(`Fetched ${logs.length} logs, total count: ${totalCount}`, 'api/logs/fetch', response)
+
+    return response
+  } catch (err) {
+    logger.error(`Error in GET /api/logs: ${err}`, 'api/logs/error', { error: err })
+    throw err
+  }
+})
+
+export default defineEventHandler((event) => {
+  return router.handler(event)  
 })

@@ -21,15 +21,19 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 import { useUsers } from '../composables/useUsers';
+import { useLogger } from '../../logging/composables/useLogger';
 
 const { users, isLoading, error, fetchUsers } = useUsers();
+const logger = useLogger();
 
 // Add a watch to log when users change
 watch(users, (newUsers) => {
-  // console.log('Users updated:', newUsers);
+  logger.debug('Users data updated', 'UserStats');
 });
 
 const userStats = computed(() => {
+  logger.debug('Generating user stats', 'UserStats');
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   
@@ -42,7 +46,7 @@ const userStats = computed(() => {
     user: users.value.filter(user => user.user_metadata?.role === 'user').length,
   };
 
-  return [
+  const stats = [
     {
       title: 'Total Users',
       value: users.value.length,
@@ -64,18 +68,31 @@ const userStats = computed(() => {
       description: 'Users with admin role'
     },
     {
-      title: 'Manager Users',
+      title: 'Manager Users', 
       value: roleStats.manager,
       description: 'Users with manager role'
     },
     {
       title: 'Regular Users',
-      value: roleStats.user,
+      value: roleStats.user, 
       description: 'Users with regular user role'
     }
   ];
+
+  logger.debug('User stats generated', 'UserStats', { stats });
+
+  return stats;
 });
 
-// Manually trigger fetchUsers to ensure data is loaded
-fetchUsers();
+// Fetch user data and log results
+const fetchData = async () => {
+  try {
+    logger.info('Fetching user data', 'UserStats');
+    await fetchUsers();
+    logger.info('User data fetched successfully', 'UserStats');
+  } catch (err) {
+    logger.error('Error fetching user data', 'UserStats', { error: err });
+  }
+};
+fetchData();
 </script>

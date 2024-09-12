@@ -1,132 +1,133 @@
 <template>
-  <div>    
-    <!-- Filters -->
-    <div class="mb-4 flex space-x-4">
-      <input v-model="filters.message" placeholder="Search message" class="border p-2 rounded" />
-      <select v-model="filters.level" class="border p-2 rounded">
-        <option value="">All Levels</option>
-        <option value="info">Info</option>
-        <option value="warn">Warn</option>
-        <option value="error">Error</option>
-        <option value="debug">Debug</option>
-      </select>
-      <input v-model="filters.category" placeholder="Category" class="border p-2 rounded" />
+  <div>
+    <div class="mb-4">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Search by Category</span>
+        </label>
+        <input v-model="categoryFilter" type="text" placeholder="Search logs by category" class="input input-bordered w-full" />
+      </div>
     </div>
 
-    <!-- Log Table -->
-    <table class="min-w-full bg-white">
-      <thead>
-        <tr>
-          <th class="py-2 px-4 border-b">Time</th>
-          <th class="py-2 px-4 border-b">Level</th>
-          <th class="py-2 px-4 border-b">Category</th>
-          <th class="py-2 px-4 border-b">Message</th>
-          <th class="py-2 px-4 border-b">Metadata</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="log in filteredLogs" :key="log.id" :class="{'bg-gray-100': log.level === 'error'}">
-          <td class="py-2 px-4 border-b">{{ formatDate(log.created_at) }}</td>
-          <td class="py-2 px-4 border-b">
-            <span :class="getLevelClass(log.level)">{{ log.level }}</span>
-          </td>
-          <td class="py-2 px-4 border-b">{{ log.category }}</td>
-          <td class="py-2 px-4 border-b">{{ log.message }}</td>
-          <td class="py-2 px-4 border-b">
-            <pre>{{ JSON.stringify(log.metadata, null, 2) }}</pre>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- Pagination -->
-    <div class="mt-4 flex justify-between items-center">
-      <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
-        Previous
-      </button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
-        Next
-      </button>
+    <div class="mb-4">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Filter by Level</span>
+        </label>
+        <select v-model="levelFilter" class="input input-bordered w-full">
+          <option value="">All Levels</option>
+          <option value="info">Info</option>
+          <option value="warn">Warning</option>
+          <option value="error">Error</option>
+          <option value="debug">Debug</option>
+        </select>
+      </div>  
     </div>
+
+    <div class="overflow-x-auto">
+      <table class="table w-full">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Level</th>
+            <th>Category</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="isLoading">
+            <td colspan="4" class="text-center">
+              <span class="loading loading-spinner loading-lg"></span>
+            </td>
+          </tr>
+          <tr v-else-if="logs.length === 0">
+            <td colspan="4" class="text-center">No logs found</td>
+          </tr>
+          <tr v-else v-for="log in logs" :key="log.id">
+            <td>{{ formatDate(log.createdAt) }}</td>
+            <td>
+              <div class="badge" :class="{
+                'badge-info': log.level === 'info',
+                'badge-warning': log.level === 'warn',
+                'badge-error': log.level === 'error',
+                'badge-outline': log.level === 'debug',
+              }">
+                {{ log.level }}
+              </div>
+            </td>
+            <td>{{ log.category }}</td>
+            <td>
+              <div class="collapse">
+                <input type="checkbox" /> 
+                <div class="collapse-title text-sm">
+                  {{ truncateMessage(log.message) }}
+                </div>
+                <div class="collapse-content"> 
+                  <pre><code>{{ log.message }}</code></pre>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex flex-col justify-center items-center mt-4">
+      <div class="flex flex-col justify-center items-center mt-4">
+        <span class="p-4">Page {{ pagination.page }} of {{ totalPages }}</span>
+        <select v-model="pagination.pageSize" class="select select-bordered select-sm input input-bordered" @change="updatePageSize">
+          <option :value="10">10 per page</option>
+          <option :value="25">25 per page</option>
+          <option :value="50">50 per page</option>
+        </select>
+      </div>
+      <div class="btn-group pt-4">
+        <button class="btn btn-sm" :disabled="pagination.page === 1" @click="setPage(pagination.page - 1)">«</button>
+        <button class="btn btn-sm">Page {{ pagination.page }}</button>
+        <button class="btn btn-sm" :disabled="pagination.page === totalPages" @click="setPage(pagination.page + 1)">»</button>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useLogger } from '../composables/useLogger'
 
-const logger = useLogger()
-const logs = ref<any[]>([])
-const currentPage = ref(1)
-const itemsPerPage = 10
-const totalItems = ref(0)
+const { logs, fetchLogs, loading, page, pageSize, setPage, setPageSize, totalCount, setLevel, setCategory } = useLogger()
 
-const filters = ref({
-  message: '',
-  level: '',
-  category: ''
+const isLoading = ref(true)
+const categoryFilter = ref('')
+const levelFilter = ref('')
+
+const pagination = computed(() => ({
+  page: page.value,
+  pageSize: pageSize.value
+}))
+
+const totalPages = computed(() => Math.ceil(totalCount.value / pagination.value.pageSize))
+
+const truncateMessage = (msg: string, length = 100) => {
+  if (msg.length <= length) return msg
+  return msg.slice(0, length) + '...'
+}
+
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleString()
+}
+
+const updatePageSize = () => {
+  setPageSize(pagination.value.pageSize)
+}
+
+watch([categoryFilter, levelFilter], () => {
+  setCategory(categoryFilter.value)
+  setLevel(levelFilter.value)
+  setPage(1) // Reset to first page when filters change
 })
 
-const fetchLogs = async () => {
-  try {
-    const response = await $fetch('/api/logs', {
-      method: 'GET',
-      params: {
-        page: currentPage.value,
-        itemsPerPage,
-        ...filters.value
-      }
-    })
-    logs.value = response.data
-    totalItems.value = response.total
-  } catch (error) {
-    logger.error('Failed to fetch logs', 'LogList', { error })
-  }
-}
-
-onMounted(fetchLogs)
-
-const filteredLogs = computed(() => {
-  return logs.value.filter(log =>
-    log.message.toLowerCase().includes(filters.value.message.toLowerCase()) &&
-    (filters.value.level === '' || log.level === filters.value.level) &&
-    log.category.toLowerCase().includes(filters.value.category.toLowerCase())
-  )
+fetchLogs().then(() => {
+  isLoading.value = false
 })
-
-const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage))
-
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    fetchLogs()
-  }
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-    fetchLogs()
-  }
-}
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleString()
-}
-
-const getLevelClass = (level: string) => {
-  switch (level) {
-    case 'error':
-      return 'text-red-600 font-bold'
-    case 'warn':
-      return 'text-yellow-600'
-    case 'info':
-      return 'text-blue-600'
-    case 'debug':
-      return 'text-gray-600'
-    default:
-      return ''
-  }
-}
 </script>

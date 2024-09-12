@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const config = useRuntimeConfig()
 
   // Wait for user to be loaded
-  // await until(user).not.toBeNull()
+  await until(user)
 
   const userRole = user.value?.user_metadata?.role
 
