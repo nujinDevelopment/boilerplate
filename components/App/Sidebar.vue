@@ -24,7 +24,9 @@
               </summary>
               <ul>
                 <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex">
-                  <a>{{ subItem }}</a>
+                  <NuxtLink :to="subItem.to" :class="{ active: isActive(subItem) }">
+                    {{ subItem.label }}
+                  </NuxtLink>
                 </li>
               </ul>
             </details>
@@ -83,7 +85,10 @@ const menuItems = [
   { 
     label: 'Projects', 
     icon: IconProject,
-    subItems: ['All Projects', 'Add New', 'Categories', 'Tags', 'Reports', 'Archive'],
+    subItems: [
+      { label: 'All Projects', to: '/app/projects', roles: ['admin', 'manager', 'user'] },
+      { label: 'Create Project', to: '/app/projects/create', roles: ['admin', 'manager'] },
+    ],
     roles: ['admin', 'manager', 'user']
   },
   { label: 'Settings', icon: IconSettings, to: '/app/settings', roles: ['admin', 'manager', 'user'] },
@@ -92,12 +97,24 @@ const menuItems = [
 
 const filteredMenuItems = computed(() => {
   const userRole = getCurrentUserRole();
-  return menuItems.filter(item => item.roles.includes(userRole));
+  return menuItems.map(item => {
+    if (item.subItems) {
+      return {
+        ...item,
+        subItems: item.subItems.filter(subItem => subItem.roles.includes(userRole))
+      };
+    }
+    return item;
+  }).filter(item => item.roles.includes(userRole));
 });
 
 const isActive = (item) => {
   if (item.to === route.path) {
     return true;
   }
+  if (item.subItems) {
+    return item.subItems.some(subItem => subItem.to === route.path);
+  }
+  return false;
 };
 </script>

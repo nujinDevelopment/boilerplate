@@ -41,7 +41,8 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@vite-pwa/nuxt',
     '~/modules/user-management/module',
-    '~/modules/logging/module'  // Add the new logging module
+    '~/modules/logging/module',  // Add the new logging module
+    '~/modules/projects/module'  // Add the projects module
   ],
 
   // We'll handle the auth middleware in the auth.global.ts file
