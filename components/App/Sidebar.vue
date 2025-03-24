@@ -93,6 +93,22 @@ import { defineComponent, h, computed } from 'vue';
 import { useRoute } from '#imports';
 import { useUsers } from '~/modules/user-management/composables/useUsers';
 
+type UserRole = 'admin' | 'manager' | 'user';
+
+interface MenuItem {
+  label: string;
+  icon: ReturnType<typeof defineComponent>;
+  to: string;
+  roles: UserRole[];
+  subItems?: SubMenuItem[];
+}
+
+interface SubMenuItem {
+  label: string;
+  to: string;
+  roles: UserRole[];
+}
+
 // Icons
 const IconHome = defineComponent({
   render: () => h('svg', { xmlns: "http://www.w3.org/2000/svg", class: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" },
@@ -128,12 +144,13 @@ const route = useRoute();
 const { getCurrentUserRole } = useUsers();
 
 // Menu Items Configuration
-const menuItems = [
+const menuItems: MenuItem[] = [
   { label: 'Dashboard', icon: IconHome, to: '/app/', roles: ['admin', 'manager', 'user'] },
   { label: 'Users', icon: IconUser, to: '/app/users', roles: ['admin', 'manager'] },
   { 
     label: 'Projects', 
     icon: IconProject,
+    to: '/app/projects',
     subItems: [
       { label: 'All Projects', to: '/app/projects', roles: ['admin', 'manager', 'user'] },
       { label: 'Create Project', to: '/app/projects/create', roles: ['admin', 'manager'] },
@@ -146,7 +163,7 @@ const menuItems = [
 
 // Computed Properties
 const filteredMenuItems = computed(() => {
-  const userRole = getCurrentUserRole();
+  const userRole = getCurrentUserRole() as UserRole;
   return menuItems.map(item => {
     if (item.subItems) {
       return {
@@ -162,11 +179,11 @@ const userRole = computed(() => getCurrentUserRole());
 const userName = computed(() => 'John Doe'); // Replace with actual user name from your auth system
 const userInitials = computed(() => userName.value.split(' ').map(n => n[0]).join(''));
 
-const isActive = (item) => {
+const isActive = (item: MenuItem | SubMenuItem): boolean => {
   if (item.to === route.path) {
     return true;
   }
-  if (item.subItems) {
+  if ('subItems' in item && item.subItems) {
     return item.subItems.some(subItem => subItem.to === route.path);
   }
   return false;
