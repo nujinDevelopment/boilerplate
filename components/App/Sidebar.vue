@@ -86,10 +86,9 @@
             <p class="text-sm font-medium truncate">{{ userName }}</p>
             <p class="text-xs text-base-content/60 capitalize">{{ userRole }}</p>
           </div>
-          <button class="btn btn-ghost btn-circle btn-sm hover:bg-base-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <button @click="handleLogout" class="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h5v-2H4V5h4V3H3zm12.293 2.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L17.586 11H9a1 1 0 110-2h8.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </button>
         </div>
@@ -100,7 +99,7 @@
 
 <script setup lang="ts">
 import { defineComponent, h, computed } from 'vue';
-import { useRoute } from '#imports';
+import { useRoute, useSupabaseClient, useSupabaseUser } from '#imports';
 import { useUsers } from '~/modules/user-management/composables/useUsers';
 
 type UserRole = 'admin' | 'manager' | 'user';
@@ -153,6 +152,8 @@ const IconLogs = defineComponent({
 
 const route = useRoute();
 const { getCurrentUserRole } = useUsers();
+const supabase = useSupabaseClient();
+const user = useSupabaseUser();
 
 // Menu Items Configuration
 const menuItems: MenuItem[] = [
@@ -191,8 +192,23 @@ const filteredMenuItems = computed(() => {
 });
 
 const userRole = computed(() => getCurrentUserRole());
-const userName = computed(() => 'John Doe'); // Replace with actual user name from your auth system
-const userInitials = computed(() => userName.value.split(' ').map(n => n[0]).join(''));
+const userName = computed(() => user.value?.user_metadata?.name || user.value?.email || 'Anonymous');
+const userInitials = computed(() => {
+  const name = user.value?.user_metadata?.name;
+  if (name) {
+    return name.split(' ').map((n: string) => n[0]).join('');
+  }
+  return user.value?.email?.[0].toUpperCase() || 'A';
+});
+
+const handleLogout = async () => {
+  try {
+    await supabase.auth.signOut();
+    // Nuxt will automatically redirect to login page due to auth middleware
+  } catch (error) {
+    console.error('Error logging out:', error);
+  }
+};
 
 const isActive = (item: MenuItem | SubMenuItem): boolean => {
   if (!('to' in item) || !item.to) return false;
