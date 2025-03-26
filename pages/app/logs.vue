@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4">
+  <div class="">
     <div v-if="error" class="alert alert-error mb-6">{{ error }}</div>
     <div class="card bg-base-100 shadow">
       <div class="card-body">
@@ -22,7 +22,7 @@ import { useUsers } from '~/modules/user-management/composables/useUsers';
 import LoggingLogList from '~/modules/logging/components/LogList.vue';
 
 definePageMeta({
-  layout: 'app',
+  layout: 'admin',
   pageName: 'Application Logs'
 });
 

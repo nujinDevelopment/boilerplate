@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-12 grid-rows-[min-content] gap-y-12 p-4 lg:gap-x-12 ">
+  <div class="grid grid-cols-12 grid-rows-[min-content] gap-y-12 lg:gap-x-12 ">
     <AppStats />
     <AppTransactionsCard />
     <AppRevenueCard />-

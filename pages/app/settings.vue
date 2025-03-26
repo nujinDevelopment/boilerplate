@@ -17,6 +17,7 @@ const loading = ref(false)
 
 // Add page meta data
 definePageMeta({
+  layout: 'app',
   pageName: 'Profile Settings'
 });
 
@@ -81,7 +82,7 @@ const updateProfile = async () => {
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto">
     <div class="card bg-base-100 shadow">
       <div class="card-body">
         <form @submit.prevent="updateProfile">

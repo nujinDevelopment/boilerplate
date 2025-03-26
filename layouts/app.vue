@@ -1,5 +1,5 @@
 <template>
-  <div class="drawer min-h-screen bg-base-200 lg:drawer-open">
+  <div class="drawer min-h-screen bg-gradient-to-r from-primary to-secondary lg:drawer-open">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     
     <!-- Main content -->
@@ -13,20 +13,20 @@
           <!-- Page Title with Animation -->
           <div class="mb-8">
             <h1 
-              class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent transform transition-all duration-300 ease-out"
+              class="text-2xl lg:text-3xl font-bold text-white transform transition-all duration-300 ease-out"
               :class="{'translate-y-0 opacity-100': showTitle, 'translate-y-4 opacity-0': !showTitle}"
             >
               {{ pageTitle }}
             </h1>
-            <div 
+<!--             <div 
               class="h-1 w-24 bg-gradient-to-r from-primary to-secondary rounded-full mt-2 transform transition-all duration-500 ease-out delay-100"
               :class="{'scale-x-100 opacity-100': showTitle, 'scale-x-0 opacity-0': !showTitle}"
-            ></div>
+            ></div> -->
           </div>
 
           <!-- Page Content with Card Style -->
           <div 
-            class="bg-base-100 rounded-box shadow-lg p-6 min-h-[calc(100vh-12rem)] transform transition-all duration-300 ease-out"
+            class="p-6 min-h-[calc(100vh-12rem)] transform transition-all duration-300 ease-out"
             :class="{'translate-y-0 opacity-100': showContent, 'translate-y-4 opacity-0': !showContent}"
           >
             <slot />

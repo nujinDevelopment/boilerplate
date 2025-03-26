@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4">
+  <div class="">
     <div v-if="error" class="alert alert-error mb-6">{{ error }}</div>
     <UserManagementUserStats v-if="showStats && canViewStats" class="mb-6" />
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
