@@ -24,12 +24,22 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false,
     redirectOptions: {
-      // login: '/login',
-      // callback: '/confirm'
+      login: '/login',
+      callback: '/confirm'
     }
   },
 
   runtimeConfig: {
+    email: {
+      smtp: {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_SECURE === 'true'
+      },
+      user: process.env.EMAIL_USER,
+      password: process.env.EMAIL_PASSWORD,
+      name: process.env.EMAIL_FROM_NAME
+    },
     public: {
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY
@@ -41,17 +51,13 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@vite-pwa/nuxt',
     '~/modules/user-management/module',
+    '~/modules/subscription/module',
 /*     '~/modules/logging/module',  // Add the new logging module
     '~/modules/projects/module'  // Add the projects module */
   ],
 
   // We'll handle the auth middleware in the auth.global.ts file
   routeRules: {
-    '/app/**': { middleware: ['auth'] }
-  },
-
-  // Configuration for the logging module
-  logging: {
-    // Add any specific configuration for the logging module if needed
+    '/app/**': { appMiddleware: ['auth'] }
   }
 })
