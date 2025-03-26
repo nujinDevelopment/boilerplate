@@ -24,43 +24,62 @@
       <!-- Navigation Menu -->
       <div class="flex-1 overflow-y-auto px-4 py-6">
         <ul class="menu menu-lg gap-2">
-          <li v-for="(item, index) in filteredMenuItems" :key="index">
-            <template v-if="item.subItems">
-              <details class="group">
-                <summary class="menu-title rounded-lg hover:bg-base-200 transition-all duration-200">
-                  <component 
-                    :is="item.icon" 
-                    class="h-5 w-5 text-primary group-hover:text-primary-focus transition-colors duration-200" 
-                  />
-                  <span class="font-medium">{{ item.label }}</span>
-                </summary>
-                <ul class="menu-sub pl-6 mt-2 space-y-1">
-                  <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex">
-                    <NuxtLink 
-                      :to="subItem.to" 
-                      class="rounded-lg transition-all duration-200 hover:bg-base-200"
-                      :class="{ 'bg-primary/10 text-primary font-medium': isActive(subItem) }"
+          <template v-for="(item, index) in filteredMenuItems" :key="index">
+            <div v-if="item.type === 'divider'" class="mt-4 mb-2 px-3">
+              <div class="flex items-center gap-2">
+                <div class="h-px flex-1 bg-base-content/10"></div>
+                <span class="text-xs font-medium text-base-content/60">{{ item.label }}</span>
+                <div class="h-px flex-1 bg-base-content/10"></div>
+              </div>
+            </div>
+            <li v-else>
+              <template v-if="item.subItems">
+                <details class="group">
+                  <summary class="menu-title rounded-lg hover:bg-base-200 transition-all duration-200 flex items-center gap-3 pr-2">
+                    <component 
+                      :is="item.icon" 
+                      class="h-5 w-5 transition-colors duration-200"
+                      :class="isActive(item) ? 'text-primary' : 'text-base-content/70 group-hover:text-primary'" 
+                    />
+                    <span class="flex-1 font-medium">{{ item.label }}</span>
+                    <svg 
+                      class="h-4 w-4 transition-transform duration-200"
+                      :class="{ 'rotate-90': isActive(item) }"
+                      xmlns="http://www.w3.org/2000/svg" 
+                      viewBox="0 0 20 20" 
+                      fill="currentColor"
                     >
-                      {{ subItem.label }}
-                    </NuxtLink>
-                  </li>
-                </ul>
-              </details>
-            </template>
-            <NuxtLink 
-              v-else 
-              :to="item.to" 
-              class="rounded-lg group transition-all duration-200 hover:bg-base-200"
-              :class="{ 'bg-primary/10 text-primary font-medium': isActive(item) }"
-            >
-              <component 
-                :is="item.icon" 
-                class="h-5 w-5 transition-colors duration-200"
-                :class="isActive(item) ? 'text-primary' : 'text-base-content/70 group-hover:text-primary'" 
-              />
-              <span>{{ item.label }}</span>
-            </NuxtLink>
-          </li>
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </summary>
+                  <ul class="menu-sub pl-8 mt-2 space-y-1">
+                    <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex">
+                      <NuxtLink 
+                        :to="subItem.to" 
+                        class="rounded-lg transition-all duration-200 hover:bg-base-200"
+                        :class="{ 'bg-primary/10 text-primary font-medium': isActive(subItem) }"
+                      >
+                        {{ subItem.label }}
+                      </NuxtLink>
+                    </li>
+                  </ul>
+                </details>
+              </template>
+              <NuxtLink 
+                v-else 
+                :to="item.to" 
+                class="rounded-lg group transition-all duration-200 hover:bg-base-200"
+                :class="{ 'bg-primary/10 text-primary font-medium': isActive(item) }"
+              >
+                <component 
+                  :is="item.icon" 
+                  class="h-5 w-5 transition-colors duration-200"
+                  :class="isActive(item) ? 'text-primary' : 'text-base-content/70 group-hover:text-primary'" 
+                />
+                <span>{{ item.label }}</span>
+              </NuxtLink>
+            </li>
+          </template>
         </ul>
       </div>
 
@@ -97,10 +116,11 @@ type UserRole = 'admin' | 'manager' | 'user';
 
 interface MenuItem {
   label: string;
-  icon: ReturnType<typeof defineComponent>;
-  to: string;
-  roles: UserRole[];
+  icon?: ReturnType<typeof defineComponent>;
+  to?: string;
+  roles?: UserRole[];
   subItems?: SubMenuItem[];
+  type?: 'divider';
 }
 
 interface SubMenuItem {
@@ -157,6 +177,7 @@ const menuItems: MenuItem[] = [
     roles: ['admin', 'manager', 'user']
   },
   { label: 'Settings', icon: IconSettings, to: '/app/settings', roles: ['admin', 'manager', 'user'] },
+  { type: 'divider', label: 'Admin' },
   { label: 'Users', icon: IconUser, to: '/admin/users', roles: ['admin', 'manager'] },
   { label: 'Logs', icon: IconLogs, to: '/admin/logs', roles: ['admin'] },
 ];
@@ -164,15 +185,18 @@ const menuItems: MenuItem[] = [
 // Computed Properties
 const filteredMenuItems = computed(() => {
   const userRole = getCurrentUserRole() as UserRole;
-  return menuItems.map(item => {
-    if (item.subItems) {
-      return {
-        ...item,
-        subItems: item.subItems.filter(subItem => subItem.roles.includes(userRole))
-      };
+  return menuItems.filter(item => {
+    if (item.type === 'divider') {
+      // Show divider if there are visible items after it
+      const itemsAfterDivider = menuItems.slice(menuItems.indexOf(item) + 1);
+      return itemsAfterDivider.some(nextItem => nextItem.roles?.includes(userRole));
     }
-    return item;
-  }).filter(item => item.roles.includes(userRole));
+    if (item.subItems) {
+      const filteredSubItems = item.subItems.filter(subItem => subItem.roles.includes(userRole));
+      return filteredSubItems.length > 0 && item.roles?.includes(userRole);
+    }
+    return item.roles?.includes(userRole);
+  });
 });
 
 const userRole = computed(() => getCurrentUserRole());
@@ -180,6 +204,7 @@ const userName = computed(() => 'John Doe'); // Replace with actual user name fr
 const userInitials = computed(() => userName.value.split(' ').map(n => n[0]).join(''));
 
 const isActive = (item: MenuItem | SubMenuItem): boolean => {
+  if (!('to' in item) || !item.to) return false;
   if (item.to === route.path) {
     return true;
   }
@@ -225,5 +250,13 @@ details[open] .menu-title {
 /* Avatar Animation */
 .avatar {
   @apply transition-transform duration-200 hover:scale-105;
+}
+
+/* Remove default details marker */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
 }
 </style>
