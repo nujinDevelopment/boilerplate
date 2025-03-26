@@ -99,7 +99,7 @@
 
 <script setup lang="ts">
 import { defineComponent, h, computed } from 'vue';
-import { useRoute, useSupabaseClient, useSupabaseUser } from '#imports';
+import { useRoute, useSupabaseClient, useSupabaseUser, navigateTo } from '#imports';
 import { useUsers } from '~/modules/user-management/composables/useUsers';
 
 type UserRole = 'admin' | 'manager' | 'user';
@@ -204,7 +204,7 @@ const userInitials = computed(() => {
 const handleLogout = async () => {
   try {
     await supabase.auth.signOut();
-    // Nuxt will automatically redirect to login page due to auth middleware
+    await navigateTo('/login');
   } catch (error) {
     console.error('Error logging out:', error);
   }
