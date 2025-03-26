@@ -45,6 +45,13 @@ export default defineNuxtModule({
         path: resolve(runtimeDir, 'components'),
         prefix: 'Payment'
       })
+      
+      // Register admin components without prefix
+      dirs.push({
+        path: resolve(runtimeDir, 'components'),
+        pattern: ['*/Admin*.vue'],
+        prefix: ''
+      })
     })
 
     // Register pages
