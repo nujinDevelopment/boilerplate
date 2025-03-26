@@ -34,25 +34,16 @@
             </div>
             <li v-else>
               <template v-if="item.subItems">
-                <details class="group">
-                  <summary class="menu-title rounded-lg hover:bg-base-200 transition-all duration-200 flex items-center gap-3 pr-2">
+                <details>
+                  <summary class="rounded-lg hover:bg-base-200 transition-all duration-200">
                     <component 
                       :is="item.icon" 
                       class="h-5 w-5 transition-colors duration-200"
                       :class="isActive(item) ? 'text-primary' : 'text-base-content/70 group-hover:text-primary'" 
                     />
-                    <span class="flex-1 font-medium">{{ item.label }}</span>
-                    <svg 
-                      class="h-4 w-4 transition-transform duration-200"
-                      :class="{ 'rotate-90': isActive(item) }"
-                      xmlns="http://www.w3.org/2000/svg" 
-                      viewBox="0 0 20 20" 
-                      fill="currentColor"
-                    >
-                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
+                    {{ item.label }}
                   </summary>
-                  <ul class="menu-sub pl-8 mt-2 space-y-1">
+                  <ul>
                     <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex">
                       <NuxtLink 
                         :to="subItem.to" 
@@ -234,29 +225,8 @@ const isActive = (item: MenuItem | SubMenuItem): boolean => {
   @apply bg-primary/20 rounded-full hover:bg-primary/30 transition-colors;
 }
 
-/* Menu Animations */
-.menu-title {
-  @apply transition-all duration-200;
-}
-
-.menu-sub {
-  @apply transition-all duration-200;
-}
-
-details[open] .menu-title {
-  @apply bg-primary/10 text-primary;
-}
-
 /* Avatar Animation */
 .avatar {
   @apply transition-transform duration-200 hover:scale-105;
-}
-
-/* Remove default details marker */
-details > summary {
-  list-style: none;
-}
-details > summary::-webkit-details-marker {
-  display: none;
 }
 </style>
