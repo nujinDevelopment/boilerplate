@@ -33,7 +33,7 @@ import UserManagementUserList from '~/modules/user-management/components/UserLis
 import UserManagementUserForm from '~/modules/user-management/components/UserForm.vue';
 
 definePageMeta({
-  layout: 'app',
+  layout: 'admin',
   pageName: 'User Management'
 });
 

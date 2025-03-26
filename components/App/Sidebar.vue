@@ -146,7 +146,6 @@ const { getCurrentUserRole } = useUsers();
 // Menu Items Configuration
 const menuItems: MenuItem[] = [
   { label: 'Dashboard', icon: IconHome, to: '/app/', roles: ['admin', 'manager', 'user'] },
-  { label: 'Users', icon: IconUser, to: '/app/users', roles: ['admin', 'manager'] },
   { 
     label: 'Projects', 
     icon: IconProject,
@@ -158,7 +157,8 @@ const menuItems: MenuItem[] = [
     roles: ['admin', 'manager', 'user']
   },
   { label: 'Settings', icon: IconSettings, to: '/app/settings', roles: ['admin', 'manager', 'user'] },
-  { label: 'Logs', icon: IconLogs, to: '/app/logs', roles: ['admin'] },
+  { label: 'Users', icon: IconUser, to: '/admin/users', roles: ['admin', 'manager'] },
+  { label: 'Logs', icon: IconLogs, to: '/admin/logs', roles: ['admin'] },
 ];
 
 // Computed Properties

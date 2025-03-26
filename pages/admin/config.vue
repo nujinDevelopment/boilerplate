@@ -17,7 +17,7 @@ const loading = ref(false)
 
 // Add page meta data
 definePageMeta({
-  layout: 'app',
+  layout: 'admin',
   pageName: 'Profile Settings'
 });
 
