@@ -1,10 +1,31 @@
 import { ref, reactive } from 'vue'
 import { useSupabaseUser } from '#imports'
 
+interface User {
+  id: string
+  email?: string
+  user_metadata: {
+    name?: string
+    role?: string
+  }
+  [key: string]: any
+}
+
+interface UserListResponse {
+  data: User[]
+  total: number
+}
+
+interface ResetPasswordResponse {
+  resetLink: string
+}
+
+type ApiResponse = User | UserListResponse | ResetPasswordResponse | { success: boolean }
+
 export const useUsers = () => {
-  const users = ref([])
+  const users = ref<User[]>([])
   const isLoading = ref(false)
-  const error = ref(null)
+  const error = ref<string | null>(null)
   const totalUsers = ref(0)
 
   const filters = reactive({
@@ -23,12 +44,20 @@ export const useUsers = () => {
     return user.value?.user_metadata?.role || null
   }
 
-  const handleApiError = (err) => {
+  interface ApiError {
+    response?: {
+      status?: number
+    }
+    message?: string
+  }
+
+  const handleApiError = (err: unknown) => {
     console.error('API Error:', err)
-    if (err.response?.status === 403) {
+    const apiError = err as ApiError
+    if (apiError.response?.status === 403) {
       error.value = 'You do not have permission to perform this action.'
     } else {
-      error.value = `An error occurred: ${err.message}`
+      error.value = `An error occurred: ${apiError.message || 'Unknown error'}`
     }
     throw err
   }
@@ -37,15 +66,15 @@ export const useUsers = () => {
     isLoading.value = true
     error.value = null
     try {
-      const { data, total } = await $fetch('/api/users', {
+      const response = await $fetch<UserListResponse>('/api/users', {
         params: {
           ...filters,
           page: pagination.page,
           pageSize: pagination.pageSize
         }
       })
-      users.value = data
-      totalUsers.value = total
+      users.value = response.data
+      totalUsers.value = response.total
     } catch (err) {
       handleApiError(err)
     } finally {
@@ -53,24 +82,39 @@ export const useUsers = () => {
     }
   }
 
-  const setFilters = (newFilters) => {
+  interface Filters {
+    email?: string
+    name?: string
+    role?: string
+  }
+
+  const setFilters = (newFilters: Partial<Filters>) => {
     Object.assign(filters, newFilters)
     pagination.page = 1 // Reset to first page when filters change
     fetchUsers()
   }
 
-  const setPage = (page) => {
+  const setPage = (page: number) => {
     pagination.page = page
     fetchUsers()
   }
 
-  const setPageSize = (pageSize) => {
+  const setPageSize = (pageSize: number) => {
     pagination.pageSize = pageSize
     pagination.page = 1 // Reset to first page when page size changes
     fetchUsers()
   }
 
-  const createUser = async (userData) => {
+  interface CreateUserData {
+    email: string
+    password: string
+    user_metadata: {
+      name: string
+      role: string
+    }
+  }
+
+  const createUser = async (userData: CreateUserData) => {
     error.value = null
     try {
       console.log('Creating user with data:', userData)
@@ -79,9 +123,7 @@ export const useUsers = () => {
         body: {
           email: userData.email,
           password: userData.password,
-          user_metadata: {
-            name: userData.user_metadata.name,
-          },
+          user_metadata: userData.user_metadata,
           role: userData.user_metadata.role
         }
       })
@@ -93,7 +135,16 @@ export const useUsers = () => {
     }
   }
 
-  const updateUser = async (userData) => {
+  interface UpdateUserData {
+    id: string
+    email: string
+    user_metadata: {
+      name: string
+      role?: string
+    }
+  }
+
+  const updateUser = async (userData: UpdateUserData) => {
     error.value = null
     try {
       const updatedUser = await $fetch('/api/users', {
@@ -101,9 +152,7 @@ export const useUsers = () => {
         body: {
           id: userData.id,
           email: userData.email,
-          user_metadata: {
-            name: userData.user_metadata.name,
-          },
+          user_metadata: userData.user_metadata,
           role: userData.user_metadata.role
         }
       })
@@ -114,7 +163,7 @@ export const useUsers = () => {
     }
   }
 
-  const deleteUser = async (userId) => {
+  const deleteUser = async (userId: string) => {
     error.value = null
     try {
       await $fetch('/api/users', {
@@ -127,10 +176,10 @@ export const useUsers = () => {
     }
   }
 
-  const resetPassword = async (user) => {
+  const resetPassword = async (user: User) => {
     error.value = null
     try {
-      const response = await $fetch('/api/users', {
+      const response = await $fetch<ResetPasswordResponse>('/api/users', {
         method: 'POST',
         body: { id: user.id, email: user.email, action: 'reset_password' }
       })

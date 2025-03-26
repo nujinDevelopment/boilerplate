@@ -10,7 +10,7 @@ const ROLE_PERMISSIONS = {
   DELETE: ['admin']
 }
 
-const checkUserRole = (userRole, allowedRoles) => {
+const checkUserRole = (userRole: string, allowedRoles: string[]): boolean => {
   return allowedRoles.includes(userRole)
 }
 
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
       // Apply filters
       if (email) {
-        users = users.filter(user => user.email.toLowerCase().includes(String(email).toLowerCase()))
+        users = users.filter(user => user.email?.toLowerCase().includes(String(email).toLowerCase()) ?? false)
       }
       if (name) {
         users = users.filter(user => user.user_metadata?.name?.toLowerCase().includes(String(name).toLowerCase()))
@@ -70,9 +70,10 @@ export default defineEventHandler(async (event) => {
       users = users.slice(startIndex, endIndex)
 
       return { data: users, total }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Unexpected error in GET /api/users:', err)
-      throw createError({ statusCode: 500, statusMessage: `Unexpected error: ${err.message}` })
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      throw createError({ statusCode: 500, statusMessage: `Unexpected error: ${errorMessage}` })
     }
   }
 
@@ -106,9 +107,10 @@ export default defineEventHandler(async (event) => {
 
         console.log('Successfully generated password reset link')
         return { resetLink: data.properties.action_link }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Unexpected error resetting password:', error)
-        throw createError({ statusCode: 500, statusMessage: `Unexpected error resetting password: ${error.message}` })
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        throw createError({ statusCode: 500, statusMessage: `Unexpected error resetting password: ${errorMessage}` })
       }
     } else {
       try {
@@ -131,21 +133,23 @@ export default defineEventHandler(async (event) => {
         }
         console.log('User created successfully:', data.user)
         return data.user
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Unexpected error creating user:', error)
-        throw createError({ statusCode: 500, statusMessage: `Unexpected error creating user: ${error.message}` })
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        throw createError({ statusCode: 500, statusMessage: `Unexpected error creating user: ${errorMessage}` })
       }
     }
   }
 
   if (event.req.method === 'PUT') {
-    if (!checkUserRole(userRole, ROLE_PERMISSIONS.PUT)) {
-      throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
-    }
-
     const body = await readBody(event)
     console.log('Received update user data:', body)
     const { id, email, user_metadata, role } = body
+
+    // Allow users to update their own profile, but require admin role for updating other users
+    if (id !== user.id && !checkUserRole(userRole, ROLE_PERMISSIONS.PUT)) {
+      throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+    }
 
     if (role && !ROLES.includes(role)) {
       console.error('Invalid role received for update:', role)
