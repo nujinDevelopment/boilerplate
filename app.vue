@@ -2,10 +2,14 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
+type LayoutName = 'admin' | 'app' | 'default'
+
 const route = useRoute()
 
-const layout = computed(() => {
-  return route.path.startsWith('/app') ? 'app' : 'default'
+const layout = computed<LayoutName>(() => {
+  if (route.path.startsWith('/admin')) return 'admin'
+  if (route.path.startsWith('/app')) return 'app'
+  return 'default'
 })
 </script>
 

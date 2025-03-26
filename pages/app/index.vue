@@ -14,6 +14,7 @@ import AppRevenueCard from '~/components/App/RevenueCard.vue';
 
 // Add page meta data
 definePageMeta({
+  layout: 'admin',
   pageName: 'Dashboard'
 });
 
