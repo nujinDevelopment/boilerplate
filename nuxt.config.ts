@@ -58,6 +58,6 @@ export default defineNuxtConfig({
 
   // We'll handle the auth middleware in the auth.global.ts file
   routeRules: {
-    '/app/**': { appMiddleware: ['auth'] }
+    '/app/**': { middleware: ['auth'] }
   }
 })
