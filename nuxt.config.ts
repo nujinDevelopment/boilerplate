@@ -22,10 +22,27 @@ export default defineNuxtConfig({
   },
 
   supabase: {
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY,
+    serviceKey: process.env.SUPABASE_SERVICE_KEY,
     redirect: false,
     redirectOptions: {
       login: '/login',
       callback: '/confirm'
+    },
+    cookieOptions: {
+      maxAge: 60 * 60 * 8,
+      domain: '',
+      path: '/',
+      sameSite: 'lax'
+    },
+    clientOptions: {
+      auth: {
+        flowType: 'pkce',
+        detectSessionInUrl: true,
+        persistSession: true,
+        autoRefreshToken: true
+      }
     }
   },
 
@@ -39,22 +56,18 @@ export default defineNuxtConfig({
       user: process.env.EMAIL_USER,
       password: process.env.EMAIL_PASSWORD,
       name: process.env.EMAIL_FROM_NAME
-    },
-    public: {
-      supabaseUrl: process.env.SUPABASE_URL,
-      supabaseKey: process.env.SUPABASE_KEY
     }
   },
 
   modules: [
+    '@nuxtjs/supabase', // Ensure Supabase is first
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/supabase',
     '@vite-pwa/nuxt',
     '~/modules/user-management/module',
     '~/modules/subscription/module',
     '~/modules/content-management/module',
-/*     '~/modules/logging/module',  // Add the new logging module
-    '~/modules/projects/module'  // Add the projects module */
+    '~/modules/projects/module',
+    '~/modules/logging/module'
   ],
 
   // Auth is handled by the global middleware

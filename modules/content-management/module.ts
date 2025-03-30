@@ -1,4 +1,4 @@
-import { defineNuxtModule, addServerHandler, createResolver } from '@nuxt/kit'
+import { defineNuxtModule, addServerHandler, createResolver, addImports } from '@nuxt/kit'
 import { fileURLToPath } from 'url'
 
 export default defineNuxtModule({

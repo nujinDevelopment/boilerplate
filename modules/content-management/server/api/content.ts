@@ -1,185 +1,185 @@
-import { defineEventHandler, createError } from 'h3'
-import { getServerSession } from '#auth'
-import { prisma } from '~/server/database'
+import { serverSupabaseClient } from '#supabase/server'
+import { H3Event } from 'h3'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Content, CreateContentDTO, UpdateContentDTO } from '../../types'
+import type { Database } from '../../types/database.types'
 
-// Get all content
-export const GET = defineEventHandler(async (event) => {
-  const session = await getServerSession(event)
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized'
-    })
-  }
+export default defineEventHandler(async (event: H3Event) => {
+  const client = await serverSupabaseClient<Database>(event)
+  
+  // GET all contents or a single content
+  if (event.req.method === 'GET') {
+    const id = getRouterParam(event, 'id')
+    
+    if (id) {
+      // Fetch a single content with its versions
+      const { data, error } = await client
+        .from('contents')
+        .select('*, versions:content_versions(*)')
+        .eq('id', id)
+        .single()
 
-  try {
-    const contents = await prisma.content.findMany({
-      orderBy: {
-        updatedAt: 'desc'
+      if (error) {
+        throw createError({ statusCode: 404, statusMessage: `Content with ID ${id} not found` })
       }
-    })
-    return contents
-  } catch (error) {
-    console.error('Failed to fetch contents:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to fetch contents'
-    })
+      return { content: data }
+    } else {
+      // Fetch all contents with their latest versions
+      const { data, error } = await client
+        .from('contents')
+        .select('*, versions:content_versions(*)')
+        .order('updated_at', { ascending: false })
+
+      if (error) {
+        throw createError({ statusCode: 500, statusMessage: 'Failed to fetch contents' })
+      }
+      return { contents: data }
+    }
   }
-})
-
-// Get single content by ID
-export const getContentById = defineEventHandler(async (event) => {
-  const session = await getServerSession(event)
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized'
-    })
-  }
-
-  const id = event.context.params?.id
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      message: 'Content ID is required'
-    })
-  }
-
-  try {
-    const content = await prisma.content.findUnique({
-      where: { id }
-    })
-
-    if (!content) {
-      throw createError({
-        statusCode: 404,
-        message: 'Content not found'
-      })
+  
+  // POST - Create new content
+  if (event.req.method === 'POST') {
+    const body: CreateContentDTO = await readBody(event)
+    
+    if (!body.title || !body.type || !body.content) {
+      throw createError({ statusCode: 400, statusMessage: 'Title, type and content are required' })
     }
 
-    return content
-  } catch (error) {
-    console.error('Failed to fetch content:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to fetch content'
-    })
-  }
-})
-
-// Create new content
-export const POST = defineEventHandler(async (event) => {
-  const session = await getServerSession(event)
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized'
-    })
-  }
-
-  const body = await readBody<CreateContentDTO>(event)
-  if (!body.title || !body.type || !body.content) {
-    throw createError({
-      statusCode: 400,
-      message: 'Missing required fields'
-    })
-  }
-
-  try {
-    const content = await prisma.content.create({
-      data: {
+    // Create content
+    const { data: content, error: contentError } = await client
+      .from('contents')
+      .insert({
         title: body.title,
         type: body.type,
-        content: body.content,
         metadata: body.metadata || {},
         status: 'draft',
-        createdBy: session.user.id
+        created_by: (await client.auth.getUser()).data.user?.id || '',
+        schedule_publish_at: body.schedule_publish_at
+      })
+      .select()
+      .single()
+
+    if (contentError || !content) {
+      throw createError({ statusCode: 400, statusMessage: `Failed to create content: ${contentError?.message || 'Unknown error'}` })
+    }
+
+    // Create initial version
+    const { data: version, error: versionError } = await client
+      .from('content_versions')
+      .insert({
+        content_id: content.id,
+        content: body.content,
+        version_number: 1,
+        created_by: (await client.auth.getUser()).data.user?.id || ''
+      })
+      .select()
+      .single()
+
+    if (versionError || !version) {
+      throw createError({ statusCode: 400, statusMessage: `Failed to create content version: ${versionError?.message || 'Unknown error'}` })
+    }
+
+    return { 
+      content: { 
+        ...content, 
+        latest_version: version 
+      } as Content, 
+      message: 'Content created successfully' 
+    }
+  }
+
+  // PUT - Update content
+  if (event.req.method === 'PUT') {
+    const id = getRouterParam(event, 'id')
+    if (!id) {
+      throw createError({ statusCode: 400, statusMessage: 'Content ID is required' })
+    }
+
+    const body: UpdateContentDTO = await readBody(event)
+    if (Object.keys(body).length === 0) {
+      throw createError({ statusCode: 400, statusMessage: 'No update data provided' })
+    }
+
+    // Get current version number if content is being updated
+    let nextVersionNumber = 1
+    if (body.content) {
+      const { data: currentVersion } = await client
+        .from('content_versions')
+        .select('version_number')
+        .eq('content_id', id)
+        .order('version_number', { ascending: false })
+        .limit(1)
+        .single()
+
+      nextVersionNumber = (currentVersion?.version_number || 0) + 1
+    }
+
+    // Update content
+    const updates = {
+      ...(body.title && { title: body.title }),
+      ...(body.type && { type: body.type }),
+      ...(body.metadata && { metadata: body.metadata }),
+      ...(body.status && { status: body.status }),
+      ...(body.schedule_publish_at && { schedule_publish_at: body.schedule_publish_at })
+    }
+
+    const { data: updatedContent, error: updateError } = await client
+      .from('contents')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (updateError || !updatedContent) {
+      throw createError({ statusCode: 400, statusMessage: `Failed to update content: ${updateError?.message || 'Unknown error'}` })
+    }
+
+    // Create new version if content was provided
+    if (body.content) {
+      const { data: newVersion, error: versionError } = await client
+        .from('content_versions')
+        .insert({
+          content_id: id,
+          content: body.content,
+          version_number: nextVersionNumber,
+          created_by: (await client.auth.getUser()).data.user?.id || ''
+        })
+        .select()
+        .single()
+
+      if (versionError || !newVersion) {
+        throw createError({ statusCode: 400, statusMessage: `Failed to create content version: ${versionError?.message || 'Unknown error'}` })
       }
-    })
-    return content
-  } catch (error) {
-    console.error('Failed to create content:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to create content'
-    })
-  }
-})
 
-// Update content
-export const PUT = defineEventHandler(async (event) => {
-  const session = await getServerSession(event)
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized'
-    })
-  }
-
-  const id = event.context.params?.id
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      message: 'Content ID is required'
-    })
-  }
-
-  const body = await readBody<UpdateContentDTO>(event)
-  if (Object.keys(body).length === 0) {
-    throw createError({
-      statusCode: 400,
-      message: 'No update data provided'
-    })
-  }
-
-  try {
-    const content = await prisma.content.update({
-      where: { id },
-      data: {
-        ...body,
-        updatedAt: new Date()
+      return { 
+        content: { 
+          ...updatedContent, 
+          latest_version: newVersion 
+        } as Content, 
+        message: 'Content and version updated successfully' 
       }
-    })
-    return content
-  } catch (error) {
-    console.error('Failed to update content:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to update content'
-    })
-  }
-})
+    }
 
-// Delete content
-export const DELETE = defineEventHandler(async (event) => {
-  const session = await getServerSession(event)
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized'
-    })
+    return { content: updatedContent as Content, message: 'Content updated successfully' }
   }
 
-  const id = event.context.params?.id
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      message: 'Content ID is required'
-    })
+  // DELETE - Delete content
+  if (event.req.method === 'DELETE') {
+    const id = getRouterParam(event, 'id')
+    if (!id) {
+      throw createError({ statusCode: 400, statusMessage: 'Content ID is required' })
+    }
+
+    const { error } = await client
+      .from('contents')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      throw createError({ statusCode: 400, statusMessage: `Failed to delete content: ${error.message}` })
+    }
+    return { message: 'Content deleted successfully' }
   }
 
-  try {
-    await prisma.content.delete({
-      where: { id }
-    })
-    return { success: true }
-  } catch (error) {
-    console.error('Failed to delete content:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to delete content'
-    })
-  }
+  throw createError({ statusCode: 405, statusMessage: 'Method Not Allowed' })
 })
