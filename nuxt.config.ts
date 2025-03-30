@@ -67,11 +67,12 @@ export default defineNuxtConfig({
     '~/modules/subscription/module',
     '~/modules/content-management/module',
     '~/modules/projects/module',
-    '~/modules/logging/module'
+    '~/modules/logging/module' 
   ],
 
   // Auth is handled by the global middleware
   routeRules: {
-    '/app/**': { ssr: true }
+    '/app/**': { ssr: true },
+    '/admin/**': { ssr: true },
   }
 })
