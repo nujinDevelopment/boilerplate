@@ -9,6 +9,7 @@ export default {
     "./plugins/**/*.{js,ts}",
     "./app.vue",
     "./modules/**/*.{js,vue,ts}",
+    "./assets/css/**/*.css",
   ],
   theme: {
     extend: {

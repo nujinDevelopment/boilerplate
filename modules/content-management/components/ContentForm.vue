@@ -14,7 +14,7 @@
             v-model="form.title"
             type="text"
             required
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
           />
         </div>
 
@@ -25,7 +25,7 @@
             id="type"
             v-model="form.type"
             required
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
           >
             <option value="page">Page</option>
             <option value="post">Post</option>
@@ -155,7 +155,7 @@
             />
             <button
               type="button"
-              @click="$refs.featuredImageInput.click()"
+              @click="handleImageClick"
               class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
             >
               {{ form.metadata.media.featured_image ? 'Change Image' : 'Upload Image' }}
@@ -243,7 +243,7 @@
                 <input
                   type="checkbox"
                   v-model="form.metadata.layout.sidebar"
-                  class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="rounded border-gray-300 text-primary focus:ring-primary"
                 />
                 <span class="ml-2 text-sm text-gray-700">Show Sidebar</span>
               </label>
@@ -251,7 +251,7 @@
                 <input
                   type="checkbox"
                   v-model="form.metadata.layout.header"
-                  class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="rounded border-gray-300 text-primary focus:ring-primary"
                 />
                 <span class="ml-2 text-sm text-gray-700">Show Header</span>
               </label>
@@ -259,7 +259,7 @@
                 <input
                   type="checkbox"
                   v-model="form.metadata.layout.footer"
-                  class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="rounded border-gray-300 text-primary focus:ring-primary"
                 />
                 <span class="ml-2 text-sm text-gray-700">Show Footer</span>
               </label>
@@ -280,7 +280,7 @@
               <button
                 type="button"
                 @click="restoreVersion(version.id)"
-                class="text-sm text-primary-600 hover:text-primary-900"
+                class="text-sm text-primary hover:text-primary-focus"
               >
                 Restore this version
               </button>
@@ -299,7 +299,7 @@
         <button
           type="submit"
           :disabled="loading"
-          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
         >
           {{ isEditing ? 'Update' : 'Create' }}
         </button>
@@ -444,6 +444,12 @@ const removeKeyword = (keyword: string) => {
 
 // Media Handling
 const featuredImageInput = ref<HTMLInputElement | null>(null)
+
+const handleImageClick = () => {
+  if (featuredImageInput.value) {
+    featuredImageInput.value.click()
+  }
+}
 const handleFeaturedImageUpload = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (file) {
@@ -527,54 +533,4 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style>
-.ProseMirror {
-  @apply p-4 min-h-[400px] prose max-w-none focus:outline-none;
-}
-
-.ProseMirror > * + * {
-  @apply mt-4;
-}
-
-.ProseMirror ul,
-.ProseMirror ol {
-  @apply pl-4;
-}
-
-.ProseMirror h1 {
-  @apply text-2xl font-bold;
-}
-
-.ProseMirror h2 {
-  @apply text-xl font-bold;
-}
-
-.ProseMirror h3 {
-  @apply text-lg font-bold;
-}
-
-.ProseMirror blockquote {
-  @apply pl-4 border-l-4 border-gray-300 italic;
-}
-
-.ProseMirror img {
-  @apply max-w-full h-auto;
-}
-
-.ProseMirror hr {
-  @apply my-4 border-t border-gray-300;
-}
-
-.ProseMirror a {
-  @apply text-primary-600 hover:text-primary-900;
-}
-
-.ProseMirror table {
-  @apply border-collapse w-full;
-}
-
-.ProseMirror th,
-.ProseMirror td {
-  @apply border border-gray-300 p-2;
-}
-</style>
+<style src="@/assets/css/prosemirror.css"></style>

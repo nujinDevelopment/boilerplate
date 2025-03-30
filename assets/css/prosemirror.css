@@ -1,0 +1,51 @@
+@layer components {
+  .ProseMirror {
+    @apply p-4 min-h-[400px] prose max-w-none focus:outline-none;
+  }
+
+  .ProseMirror > * + * {
+    @apply mt-4;
+  }
+
+  .ProseMirror ul,
+  .ProseMirror ol {
+    @apply pl-4;
+  }
+
+  .ProseMirror h1 {
+    @apply text-2xl font-bold;
+  }
+
+  .ProseMirror h2 {
+    @apply text-xl font-bold;
+  }
+
+  .ProseMirror h3 {
+    @apply text-lg font-bold;
+  }
+
+  .ProseMirror blockquote {
+    @apply pl-4 border-l-4 border-gray-300 italic;
+  }
+
+  .ProseMirror img {
+    @apply max-w-full h-auto;
+  }
+
+  .ProseMirror hr {
+    @apply my-4 border-t border-gray-300;
+  }
+
+  .ProseMirror a {
+    @apply text-primary hover:text-primary-focus;
+  }
+
+  .ProseMirror table {
+    @apply border-collapse w-full;
+  }
+
+  .ProseMirror th,
+  .ProseMirror td {
+    @apply border border-gray-300 p-2;
+  }
+}
