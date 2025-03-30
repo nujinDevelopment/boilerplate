@@ -41,7 +41,7 @@
             id="status"
             v-model="form.status"
             required
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
           >
             <option value="draft">Draft</option>
             <option value="published">Published</option>
@@ -87,7 +87,7 @@
               @keydown.enter.prevent="addCategory"
               type="text"
               placeholder="Add category"
-              class="inline-flex items-center px-3 py-1 rounded-full text-sm border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm border-gray-300 focus:border-primary focus:ring-primary"
             />
           </div>
         </div>
@@ -180,7 +180,7 @@
               <input
                 v-model="form.metadata.seo.title"
                 type="text"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
               />
             </div>
             <div>

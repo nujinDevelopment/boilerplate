@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @layer components {
   .ProseMirror {
     @apply p-4 min-h-[400px] prose max-w-none focus:outline-none;
