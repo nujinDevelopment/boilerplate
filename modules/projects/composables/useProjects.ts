@@ -1,10 +1,11 @@
 import { ref } from 'vue'
-import { useRequestHeaders } from '#imports'
+import { useRequestHeaders } from 'h3'
 
 interface Project {
   id?: string
   name: string
   description: string
+  owner_id: string
 }
 
 export function useProjects() {

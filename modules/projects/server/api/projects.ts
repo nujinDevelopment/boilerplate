@@ -1,14 +1,18 @@
 import { serverSupabaseClient } from '#supabase/server'
 import { H3Event } from 'h3'
+import type { Database } from '../../types/database.types'
 
-interface Project {
+type Project = Database['public']['Tables']['projects']['Row']
+
+interface ProjectInput {
   id?: string
   name: string
   description: string
+  owner_id: string
 }
 
 export default defineEventHandler(async (event: H3Event) => {
-  const client = serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
   
   // GET all projects or a single project
   if (event.req.method === 'GET') {
@@ -42,7 +46,7 @@ export default defineEventHandler(async (event: H3Event) => {
   
   // POST - Create a new project
   if (event.req.method === 'POST') {
-    const body: Project = await readBody(event)
+    const body: ProjectInput = await readBody(event)
     
     if (!body.name || !body.description) {
       throw createError({ statusCode: 400, statusMessage: 'Name and description are required' })
@@ -66,7 +70,7 @@ export default defineEventHandler(async (event: H3Event) => {
       throw createError({ statusCode: 400, statusMessage: 'Project ID is required' })
     }
 
-    const body: Project = await readBody(event)
+    const body: ProjectInput = await readBody(event)
     
     if (!body.name || !body.description) {
       throw createError({ statusCode: 400, statusMessage: 'Name and description are required' })

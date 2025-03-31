@@ -1,94 +1,82 @@
-import { createRouter, defineEventHandler, useBody } from 'h3'
-import { z } from 'zod'
-import { prisma } from '@/server/database/client'
-import { useLogger } from '@/modules/logging/composables/useLogger'
+import { serverSupabaseClient } from '#supabase/server'
+import { H3Event } from 'h3'
+import type { Database } from '../../types/database.types'
 
-const router = createRouter()
-const logger = useLogger()
+type Log = Database['public']['Tables']['logs']['Row']
+type LogInput = Database['public']['Tables']['logs']['Insert']
 
-const LogInputSchema = z.object({
-  message: z.string().min(1),
-  level: z.enum(['info', 'warn', 'error', 'debug']),
-  category: z.string().min(1),
-  metadata: z.record(z.unknown()).optional()
-})
+export default defineEventHandler(async (event: H3Event) => {
+  const client = await serverSupabaseClient<Database>(event)
 
-router.post('/', async (event) => {
-  try {
-    logger.info('Incoming POST request to /api/logs', 'api/logs')
+  // POST - Create a new log
+  if (event.req.method === 'POST') {
+    const body: LogInput = await readBody(event)
     
-    const body = await useBody(event)
-    const result = LogInputSchema.safeParse(body)
-
-    if (!result.success) {
-      const issues = JSON.stringify(result.error.issues) 
-      logger.warn(`Invalid log input: ${issues}`, 'api/logs/validation')
-      throw new Error('Invalid log input')
+    if (!body.message || !body.level || !body.category) {
+      throw createError({ 
+        statusCode: 400, 
+        statusMessage: 'Message, level, and category are required' 
+      })
     }
-    
-    logger.debug('Log input passed validation', 'api/logs/validation')
 
-    const log = await prisma.log.create({
-      data: {
-        message: result.data.message,
-        level: result.data.level, 
-        category: result.data.category,
-        metadata: result.data.metadata || {},
-      }
-    })
+    const { data: log, error } = await client
+      .from('logs')
+      .insert({
+        message: body.message,
+        level: body.level,
+        category: body.category,
+        metadata: body.metadata || {}
+      })
+      .select()
+      .single()
 
-    logger.info(`Log created successfully: ${log.id}`, 'api/logs/create', { log })
+    if (error) {
+      throw createError({ 
+        statusCode: 400, 
+        statusMessage: `Failed to create log: ${error.message}` 
+      })
+    }
 
-    return log
-  } catch (err) {
-    logger.error(`Error in POST /api/logs: ${err}`, 'api/logs/error', { error: err }) 
-    throw err
+    return { log, message: 'Log created successfully' }
   }
-})
 
-// API handler for fetching logs with pagination and filtering
-router.get('/', async (event) => {
-  try {
-    logger.info('Incoming GET request to /api/logs', 'api/logs')
-
-    const query = useQuery(event)
-
+  // GET - Fetch logs with pagination and filtering
+  if (event.req.method === 'GET') {
+    const query = getQuery(event)
     const page = parseInt(query.page as string) || 1
     const pageSize = parseInt(query.pageSize as string) || 10
-    const level = query.level as string 
+    const level = query.level as string
     const category = query.category as string
 
-    const where: any = {}
-    if (level) where.level = level
-    if (category) where.category = category
+    let dbQuery = client
+      .from('logs')
+      .select('*', { count: 'exact' })
 
-    logger.debug(`Fetching logs with filters: ${JSON.stringify(where)}`, 'api/logs/fetch')
-
-    const totalCount = await prisma.log.count({ where })
-  
-    const logs = await prisma.log.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,  
-    })
-  
-    const response = {
-      logs, 
-      totalCount,
-      page, 
-      pageSize
+    if (level) {
+      dbQuery = dbQuery.eq('level', level)
+    }
+    if (category) {
+      dbQuery = dbQuery.eq('category', category)
     }
 
-    logger.info(`Fetched ${logs.length} logs, total count: ${totalCount}`, 'api/logs/fetch', response)
+    const { data: logs, count, error } = await dbQuery
+      .order('created_at', { ascending: false })
+      .range((page - 1) * pageSize, page * pageSize - 1)
 
-    return response
-  } catch (err) {
-    logger.error(`Error in GET /api/logs: ${err}`, 'api/logs/error', { error: err })
-    throw err
+    if (error) {
+      throw createError({ 
+        statusCode: 500, 
+        statusMessage: `Failed to fetch logs: ${error.message}` 
+      })
+    }
+
+    return {
+      logs,
+      totalCount: count,
+      page,
+      pageSize
+    }
   }
-})
 
-export default defineEventHandler((event) => {
-  return router.handler(event)  
+  throw createError({ statusCode: 405, statusMessage: 'Method Not Allowed' })
 })

@@ -1,9 +1,10 @@
-import { defineNuxtRouteMiddleware, navigateTo, useRuntimeConfig, useSupabaseUser } from '#imports'
+import { defineNuxtRouteMiddleware, navigateTo, useRuntimeConfig, useSupabaseClient } from '#imports'
 import type { UserSubscription, SubscriptionPlan, Feature } from '../types'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const config = useRuntimeConfig()
-  const user = useSupabaseUser()
+  const client = useSupabaseClient()
+  const { data: { user } } = await client.auth.getUser()
 
   // If route doesn't require subscription, continue
   if (!to.meta.requiresSubscription) {
@@ -11,7 +12,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   // If no user, redirect to login
-  if (!user.value) {
+  if (!user) {
     return navigateTo('/login')
   }
 

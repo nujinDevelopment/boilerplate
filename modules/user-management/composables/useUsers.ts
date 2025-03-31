@@ -1,5 +1,5 @@
 import { ref, reactive } from 'vue'
-import { useSupabaseUser } from '#imports'
+
 
 interface User {
   id: string
