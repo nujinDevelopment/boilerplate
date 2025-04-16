@@ -1,69 +1,59 @@
-import { defineNuxtRouteMiddleware, useLogger, useRequestHeaders } from '#imports'
-import { v4 as uuidv4 } from 'uuid'
+import { useLogger, useRequestEvent, useSupabaseUser } from '#imports'
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const logger = useLogger()
-  const headers = useRequestHeaders()
-  const method = headers['x-http-method'] || 'unknown'
-  const requestId = uuidv4()
-
-  logger.setMetadata('requestId', requestId)
-  
-  const authUser = headers['x-auth-user']
-  const userId = authUser ? JSON.parse(authUser).userId : null
-  const userRoles = authUser ? JSON.parse(authUser).roles : []
+  const event = useRequestEvent()
+  const user = useSupabaseUser()
+  const method = event?.method || 'unknown'
 
   // Log request details
-  logger.info(
-    `[${requestId}] ${method} ${to.fullPath}`,
+  await logger.log(
+    `${method} ${to.fullPath}`,
+    'info',
     'request',
     {
       method,
       url: to.fullPath,
       params: to.params,
       query: to.query,
-      userId,
-      userRoles,
-      headers
+      userId: user.value?.id,
+      userRole: user.value?.user_metadata?.role
     }
   )
 
-  // Log request body for non-GET requests  
-  if (method !== 'GET') {
-    // Attempt to parse request body from to.meta.body
-    let body = null
+  // Log request body for non-GET requests
+  if (method !== 'GET' && to.meta.body) {
     try {
-      body = JSON.parse(to.meta.body || '{}')
-    } catch (e) {
-      // Ignore parse errors and just log empty body
-      logger.warn(
-        `[${requestId}] Failed to parse request body: ${e.message}`, 
+      const body = JSON.parse(to.meta.body as string)
+      await logger.log(
+        'Request body',
+        'debug',
         'request',
-        { error: e }
+        body
+      )
+    } catch (error: unknown) {
+      await logger.log(
+        `Failed to parse request body: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'warn',
+        'request'
       )
     }
-    
-    logger.debug(
-      `[${requestId}] Request body`, 
-      'request',
-      body
-    )
   }
 
   // Log response after navigation
-  const logResponse = () => {
-    const status = to.meta.statusCode || to.meta.statusMessage || null
-
-    logger.info(
-      `[${requestId}] Response ${status}`,
-      'response', 
+  const logResponse = async () => {
+    const status = to.meta.statusCode || to.meta.statusMessage || 'unknown'
+    await logger.log(
+      `Response ${status}`,
+      'info',
+      'response',
       {
         status,
         url: to.fullPath
       }
     )
   }
-  
+
   // Hook to log response after sending to client
   to.meta.pageTransitionCallback = logResponse
 })

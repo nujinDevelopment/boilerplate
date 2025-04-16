@@ -1,5 +1,5 @@
 import { until } from '@vueuse/core'
-import type { H3Event } from 'h3'
+import { navigateTo, useSupabaseUser, useRuntimeConfig, createError } from '#imports'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const user = useSupabaseUser()

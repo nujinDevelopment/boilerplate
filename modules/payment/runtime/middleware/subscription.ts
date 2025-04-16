@@ -1,4 +1,4 @@
-import { defineNuxtRouteMiddleware, navigateTo, useRuntimeConfig, useSupabaseClient } from '#imports'
+import { navigateTo, useRuntimeConfig, useSupabaseClient } from '#imports'
 import type { UserSubscription, SubscriptionPlan, Feature } from '../types'
 
 export default defineNuxtRouteMiddleware(async (to) => {

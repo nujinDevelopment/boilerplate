@@ -21,32 +21,35 @@ export default defineNuxtConfig({
     }
   },
 
-  supabase: {
-    url: process.env.SUPABASE_URL,
-    key: process.env.SUPABASE_KEY,
-    serviceKey: process.env.SUPABASE_SERVICE_KEY,
-    redirect: false,
-    redirectOptions: {
-      login: '/login',
-      callback: '/confirm'
-    },
-    cookieOptions: {
-      maxAge: 60 * 60 * 8,
-      domain: '',
-      path: '/',
-      sameSite: 'lax'
-    },
-    clientOptions: {
-      auth: {
-        flowType: 'pkce',
-        detectSessionInUrl: true,
-        persistSession: true,
-        autoRefreshToken: true
-      }
-    }
-  },
-
   runtimeConfig: {
+    supabase: {
+      serviceKey: process.env.SUPABASE_SERVICE_KEY
+    },
+    public: {
+      supabase: {
+        url: process.env.SUPABASE_URL,
+        key: process.env.SUPABASE_KEY,
+        redirect: false,
+        redirectOptions: {
+          login: '/login',
+          callback: '/confirm'
+        },
+        cookieOptions: {
+          maxAge: 60 * 60 * 8,
+          domain: '',
+          path: '/',
+          sameSite: 'lax'
+        },
+        clientOptions: {
+          auth: {
+            flowType: 'pkce',
+            detectSessionInUrl: true,
+            persistSession: true,
+            autoRefreshToken: true
+          }
+        }
+      }
+    },
     email: {
       smtp: {
         host: process.env.SMTP_HOST,
@@ -59,6 +62,10 @@ export default defineNuxtConfig({
     }
   },
 
+  imports: {
+    dirs: ['./server/**']
+  },
+
   modules: [
     '@nuxtjs/supabase', // Ensure Supabase is first
     '@nuxtjs/tailwindcss',
@@ -67,12 +74,12 @@ export default defineNuxtConfig({
     '~/modules/subscription/module',
     '~/modules/content-management/module',
     '~/modules/projects/module',
-    '~/modules/logging/module' 
+    '~/modules/logging/module'
   ],
 
   // Auth is handled by the global middleware
   routeRules: {
-    '/app/**': { ssr: true },
-    '/admin/**': { ssr: true },
+    '/app/**': { ssr: false },
+    '/admin/**': { ssr: false },
   }
 })

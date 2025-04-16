@@ -1,4 +1,4 @@
-import { serverSupabaseUser } from '#supabase/server'
+import { navigateTo, useSupabaseUser } from '#imports'
 import { useUsers } from '~/modules/user-management/composables/useUsers'
 import { useProjects } from '../composables/useProjects'
 import type { Database } from '../types/database.types'
@@ -6,15 +6,13 @@ import type { Database } from '../types/database.types'
 type Project = Database['public']['Tables']['projects']['Row']
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const event = useRequestEvent()
-  if (!event) {
+  const user = useSupabaseUser()
+  
+  if (!user.value) {
     return navigateTo('/login')
   }
+  
   try {
-    const user = await serverSupabaseUser(event)
-    if (!user) {
-      return navigateTo('/login')
-    }
 
     const { getCurrentUserRole } = useUsers()
     const { getProject } = useProjects()
@@ -46,7 +44,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
           const project = await getProject(projectId)
           
           // Check if user owns this project or is a manager
-          if (project.owner_id === user.id || userRole === 'manager') {
+          if (project.owner_id === user.value.id || userRole === 'manager') {
             // Allow both view and edit access
             return
           }

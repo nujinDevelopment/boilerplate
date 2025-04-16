@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useRequestHeaders } from 'h3'
 
 interface Project {
   id?: string
@@ -8,67 +7,46 @@ interface Project {
   owner_id: string
 }
 
-export function useProjects() {
-  const headers = useRequestHeaders()
+interface ProjectsResponse {
+  projects: Project[]
+}
 
+interface ProjectResponse {
+  project: Project
+  message?: string
+}
+
+export function useProjects() {
   const fetchProjects = async (): Promise<Project[]> => {
-    const response = await fetch('/api/projects', { headers })
-    if (!response.ok) {
-      throw new Error(await response.text())
-    }
-    const data = await response.json()
-    return data.projects
+    const { projects } = await $fetch<ProjectsResponse>('/api/projects')
+    return projects
   }
 
   const getProject = async (id: string): Promise<Project> => {
-    const response = await fetch(`/api/projects/${id}`, { headers })
-    if (!response.ok) {
-      throw new Error(await response.text())
-    }
-    const data = await response.json()
-    return data.project
+    const { project } = await $fetch<ProjectResponse>(`/api/projects/${id}`)
+    return project
   }
 
   const createProject = async (projectData: Omit<Project, 'id'>): Promise<Project> => {
-    const response = await fetch('/api/projects', {
+    const { project } = await $fetch<ProjectResponse>('/api/projects', {
       method: 'POST',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(projectData)
+      body: projectData
     })
-    if (!response.ok) {
-      throw new Error(await response.text())
-    }
-    const data = await response.json()
-    return data.project
+    return project
   }
 
   const updateProject = async (projectData: Project): Promise<Project> => {
-    const response = await fetch(`/api/projects/${projectData.id}`, {
+    const { project } = await $fetch<ProjectResponse>(`/api/projects/${projectData.id}`, {
       method: 'PUT',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(projectData)
+      body: projectData
     })
-    if (!response.ok) {
-      throw new Error(await response.text())
-    }
-    const data = await response.json()
-    return data.project
+    return project
   }
 
   const deleteProject = async (id: string): Promise<void> => {
-    const response = await fetch(`/api/projects/${id}`, {
-      method: 'DELETE',
-      headers
+    await $fetch<{ message: string }>(`/api/projects/${id}`, {
+      method: 'DELETE'
     })
-    if (!response.ok) {
-      throw new Error(await response.text())
-    }
   }
 
   return {
