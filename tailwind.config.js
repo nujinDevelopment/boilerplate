@@ -37,8 +37,7 @@ export default {
     daisyui
   ],
   daisyui: {
-    themes: [
-      {
+    themes: ["light", "dark", {
         nujin: {
           "primary": "#0EA5E9",
           "primary-focus": "#0284C7",
