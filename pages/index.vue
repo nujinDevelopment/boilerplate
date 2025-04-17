@@ -27,7 +27,7 @@
     </div>
 
     <!-- Enhanced Hero Section with Dynamic Shapes -->
-    <div class="hero min-h-screen relative overflow-hidden bg-gradient-to-br from-primary via-secondary to-accent" id="hero">
+    <div class="hero min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700" id="hero">
       <!-- Animated Background Shapes -->
       <div class="absolute inset-0 overflow-hidden">
         <div class="floating-shape shape-1"></div>
@@ -57,7 +57,7 @@
             Build modern web applications with elegance and efficiency.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center" data-aos="fade-up" data-aos-delay="200">
-            <a :href="repoLink" target="_blank" rel="noopener noreferrer" class="btn btn-lg glass text-white gap-2 hover:bg-white hover:text-primary transition-all duration-300">
+            <a :href="repoLink" target="_blank" rel="noopener noreferrer" class="btn btn-lg btn-primary text-white gap-2 hover:bg-white hover:text-primary transition-all duration-300">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -234,28 +234,34 @@ watch(y, (newY) => {
 <style>
 /* Animated Background Shapes */
 .floating-shape {
-  @apply absolute rounded-3xl opacity-20 backdrop-blur-3xl;
+  @apply absolute rounded-3xl opacity-40 backdrop-blur-3xl;
   animation: float 20s infinite;
+  border: 4px solid;
+  border-image: linear-gradient(to right, #ff0080, #7928ca, #00bfff) 1;
 }
 
 .shape-1 {
-  @apply bg-white/30 w-64 h-64 -top-32 -left-32;
+  @apply w-64 h-64 -top-32 -left-32;
   animation-delay: 0s;
+  background: linear-gradient(45deg, rgba(255,0,128,0.2), rgba(121,40,202,0.2));
 }
 
 .shape-2 {
-  @apply bg-white/20 w-96 h-96 top-1/4 -right-48;
+  @apply w-96 h-96 top-1/4 -right-48;
   animation-delay: -5s;
+  background: linear-gradient(45deg, rgba(121,40,202,0.2), rgba(0,191,255,0.2));
 }
 
 .shape-3 {
-  @apply bg-white/30 w-72 h-72 bottom-1/4 -left-36;
+  @apply w-72 h-72 bottom-1/4 -left-36;
   animation-delay: -10s;
+  background: linear-gradient(45deg, rgba(0,191,255,0.2), rgba(255,0,128,0.2));
 }
 
 .shape-4 {
-  @apply bg-white/20 w-80 h-80 -bottom-40 right-1/4;
+  @apply w-80 h-80 -bottom-40 right-1/4;
   animation-delay: -15s;
+  background: linear-gradient(45deg, rgba(255,0,128,0.2), rgba(0,191,255,0.2));
 }
 
 /* Module Shapes for How It Works Section */
