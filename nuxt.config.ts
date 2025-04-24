@@ -74,7 +74,8 @@ export default defineNuxtConfig({
     '~/modules/subscription/module',
     '~/modules/content-management/module',
     '~/modules/projects/module',
-    '~/modules/logging/module'
+    '~/modules/logging/module',
+    '~/modules/charts/module' // Add charts module
   ],
 
   // Auth is handled by the global middleware
