@@ -23,7 +23,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-200 flex items-center justify-center">
+  <div class="min-h-screen bg-primary flex items-center justify-center">
     <div class="card w-full max-w-sm shadow-2xl bg-base-100">
       <div class="card-body">
         <h2 class="card-title text-center mb-8">{{ register ? 'Register' : 'Login' }}</h2>

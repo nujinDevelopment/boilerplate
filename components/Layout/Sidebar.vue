@@ -16,9 +16,9 @@ defineProps<{
     'menu p-4 flex flex-col text-primary-content',
     mobile ? 'w-80 min-h-[100dvh] bg-primary backdrop-blur-sm' : 'h-full'
   ]">
-    <li class="mb-8 flex justify-center">
-      <a href="/" class="flex items-center">
-        <Logo class="w-16 h-16" />
+    <li class="">
+      <a href="/" class="flex items-center justify-center">
+        <Logo class="w-8 h-8" />
       </a>
     </li>
     

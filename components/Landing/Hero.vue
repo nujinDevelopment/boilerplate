@@ -29,13 +29,13 @@
           The modern full-stack boilerplate for building exceptional web applications with Nuxt 3.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center" data-aos="fade-up" data-aos-delay="200">
-          <a :href="repoLink" target="_blank" rel="noopener noreferrer" class="btn gap-2 bg-gradient-to-r from-primary via-secondary to-accent hover:from-primary/80 hover:via-secondary/80 hover:to-accent/80 border-none text-white">
+          <a :href="repoLink" target="_blank" rel="noopener noreferrer" class="btn gap-2 bg-base-content border-none text-base-300 hover:btn-outline rounded rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             Get Started
           </a>
-          <a href="#features" class="btn btn-ghost">
+          <a href="#features" class="btn btn-ghost rounded rounded-full">
             Learn More
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />

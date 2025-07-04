@@ -11,8 +11,8 @@ const currentRoute = useRoute()
       :class="[
         'flex items-center gap-3 py-3',
         { 
-          'bg-white text-primary': item.href === '/app' ? currentRoute.path === '/app' : currentRoute.path.startsWith(item.href),
-          'hover:bg-white hover:text-primary': !(item.href === '/app' ? currentRoute.path === '/app' : currentRoute.path.startsWith(item.href))
+          'bg-white text-gray-900': item.href === '/app' ? currentRoute.path === '/app' : currentRoute.path.startsWith(item.href),
+          'hover:bg-white hover:text-gray-900': !(item.href === '/app' ? currentRoute.path === '/app' : currentRoute.path.startsWith(item.href))
         }
       ]"
     >
