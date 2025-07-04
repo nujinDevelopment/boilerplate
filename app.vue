@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import '@/assets/css/gradient-overrides.css'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import type { LayoutKey } from '#app'
 
 const route = useRoute()
 
@@ -16,7 +18,7 @@ onMounted(() => {
   }
 })
 
-const layout = computed(() => {
+const layout = computed<LayoutKey>(() => {
   if (route.path.startsWith('/admin')) return 'admin'
   if (route.path.startsWith('/app')) return 'app'
   return 'default'

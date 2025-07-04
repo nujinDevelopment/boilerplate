@@ -1,0 +1,31 @@
+/* Primary button gradient override */
+.btn-primary {
+  background-image: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary'), theme('colors.accent')) !important;
+  background-size: 200% 200% !important;
+  animation: gradient 8s ease infinite !important;
+  border: none !important;
+  color: theme('colors.primary-content') !important;
+}
+
+/* Primary background gradient override */
+.bg-primary {
+  background-image: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary'), theme('colors.accent')) !important;
+  background-size: 200% 200% !important;
+  animation: gradient 8s ease infinite !important;
+}
+
+/* Primary text gradient override */
+.text-primary {
+  background-image: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary'), theme('colors.accent'));
+  background-size: 200% 200%;
+  animation: gradient 8s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Primary border gradient override */
+.border-primary {
+  border-image: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary'), theme('colors.accent')) 1 !important;
+  animation: gradient 8s ease infinite !important;
+}
