@@ -1,87 +1,23 @@
 <script setup lang="ts">
-const supabase = useSupabaseClient()
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-const loginError = ref('')
 const register = ref(false)
 
-const signInWithEmail = async () => {
-  console.log('signInWithEmail function called')
-  loginError.value = ''
-  console.log('Attempting to sign in with email:', email.value)
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: password.value,
-    })
-    console.log('Sign in response:', { data, error })
-    if (error) {
-      loginError.value = error.message
-      console.error('Sign in error:', error)
-    } else {
-      console.log('Sign in successful, redirecting to /app')
-      navigateTo('/app')
-    }
-  } catch (e) {
-    console.error('Unexpected error during sign in:', e)
-    loginError.value = 'An unexpected error occurred'
-  }
-}
+const { login, register: signUp, loginWithOtp, loading, error } = useAuth()
 
-const signUp = async () => {
-  console.log('signUp function called')
-  loginError.value = ''
-  if (password.value !== confirmPassword.value) {
-    loginError.value = "Passwords don't match"
-    return
-  }
-  console.log('Attempting to sign up with email:', email.value)
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.value,
-      password: password.value,
-    })
-    console.log('Sign up response:', { data, error })
-    if (error) {
-      loginError.value = error.message
-      console.error('Sign up error:', error)
-    } else {
-      console.log('Sign up successful, check email for confirmation')
-      alert('Please check your email for the confirmation link')
+const handleSubmit = async () => {
+  if (register.value) {
+    if (password.value !== confirmPassword.value) {
+      error.value = "Passwords don't match"
+      return
+    }
+    const success = await signUp(email.value, password.value)
+    if (success) {
       register.value = false
     }
-  } catch (e) {
-    console.error('Unexpected error during sign up:', e)
-    loginError.value = 'An unexpected error occurred'
-  }
-}
-
-const signInWithOtp = async () => {
-  loginError.value = ''
-  console.log('Attempting to sign in with OTP for email:', email.value)
-  const { data, error } = await supabase.auth.signInWithOtp({
-    email: email.value,
-    options: {
-      emailRedirectTo: 'http://localhost:3000/confirm',
-    }
-  })
-  console.log('OTP sign in response:', { data, error })
-  if (error) {
-    loginError.value = error.message
-    console.error('OTP sign in error:', error)
   } else {
-    console.log('OTP sign in successful, check email for login link')
-    alert('Please check your email for the login link')
-  }
-}
-
-const handleSubmit = () => {
-  console.log('Form submitted')
-  if (register.value) {
-    signUp()
-  } else {
-    signInWithEmail()
+    await login(email.value, password.value)
   }
 }
 </script>
@@ -131,13 +67,15 @@ const handleSubmit = () => {
               required
             />
           </div>
-          <div v-if="loginError" class="text-error mt-4">{{ loginError }}</div>
+          <div v-if="error" class="text-error mt-4">{{ error }}</div>
           <div class="form-control mt-6">
-            <button type="submit" class="btn btn-primary">{{ register ? 'Register' : 'Login' }}</button>
+            <button type="submit" class="btn btn-primary" :class="{ 'loading': loading }">
+              {{ register ? 'Register' : 'Login' }}
+            </button>
           </div>
         </form>
         <div class="divider">OR</div>
-        <button v-if="!register" @click="signInWithOtp" class="btn btn-outline btn-primary">
+        <button v-if="!register" @click="() => loginWithOtp(email)" class="btn btn-outline btn-primary" :class="{ 'loading': loading }">
           Sign In with Magic Link
         </button>
         <div class="text-center mt-4 flex flex-col">
