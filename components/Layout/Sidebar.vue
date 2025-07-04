@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppNavigation from './AppNavigation.vue'
 import AdminNavigation from './AdminNavigation.vue'
+import Logo from './Logo.vue'
 
 const { logout } = useAuth()
 const { adminNavigation } = useNavigation()
@@ -17,7 +18,7 @@ defineProps<{
   ]">
     <li class="mb-8 flex justify-center">
       <a href="/" class="flex items-center">
-        <!-- <img src="/logo.png" alt="BRANE Logo" class="w-16 h-16 rounded-lg" /> -->
+        <Logo class="w-16 h-16" />
       </a>
     </li>
     
