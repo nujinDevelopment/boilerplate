@@ -11,7 +11,10 @@ const currentRoute = useRoute()
         :href="item.href"
       :class="[
         'flex items-center gap-3 py-3',
-        { 'bg-white text-primary': item.href === '/app' ? currentRoute.path === '/app' : currentRoute.path.startsWith(item.href) }
+        { 
+          'bg-white text-primary': item.href === '/app' ? currentRoute.path === '/app' : currentRoute.path.startsWith(item.href),
+          'hover:bg-white hover:text-primary': !(item.href === '/app' ? currentRoute.path === '/app' : currentRoute.path.startsWith(item.href))
+        }
       ]"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
