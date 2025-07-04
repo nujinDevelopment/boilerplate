@@ -1,7 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 export const useAuth = () => {
+  const user = useSupabaseUser()
+  const role = computed(() => user.value?.user_metadata?.role || 'user')
   const { $supabase } = useNuxtApp()
   const router = useRouter()
   const toast = useToast()
@@ -123,6 +125,7 @@ export const useAuth = () => {
     loginWithOtp,
     logout,
     loading,
-    error
+    error,
+    role
   }
 }
