@@ -16,11 +16,11 @@ defineProps<{
     'menu p-4 flex flex-col text-primary-content',
     mobile ? 'w-80 min-h-[100dvh] bg-primary backdrop-blur-sm' : 'h-full'
   ]">
-    <li class="">
-      <a href="/" class="flex items-center justify-center">
-        <Logo class="w-8 h-8" fillColor="fill-white" />
+    <!-- <li>
+      <a href="/" class="grid place-items-center h-16 w-16 pt-8">
+        <Logo class="w-full h-full" fillColor="fill-primary-content" />
       </a>
-    </li>
+    </li> -->
     
     <AppNavigation :class="{ 'mt-8': adminNavigation.length > 0 }" />
 

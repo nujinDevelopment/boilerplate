@@ -39,8 +39,8 @@ onMounted(() => {
   <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-6xl px-4">
     <nav class="navbar bg-base-300/70 backdrop-blur-xl shadow-lg rounded-full border border-base-content/10">
       <div class="flex-1">
-        <NuxtLink class="btn btn-ghost rounded-full flex justify-center items-center" to="/">
-          <Logo class="h-8 w-8" fillColor="fill-base-content" />
+        <NuxtLink class="btn btn-ghost rounded-full" to="/">
+          <Logo class="h-full w-full p-2" fillColor="fill-base-content" />
         </NuxtLink>
       </div>
       
