@@ -18,7 +18,7 @@ defineProps<{
   ]">
     <li class="">
       <a href="/" class="flex items-center justify-center">
-        <Logo class="w-8 h-8" />
+        <Logo class="w-8 h-8" fillColor="fill-white" />
       </a>
     </li>
     

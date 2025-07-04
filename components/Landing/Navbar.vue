@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useScroll } from '@vueuse/core'
+import Logo from '../Layout/Logo.vue'
 
 const isOnTop = ref(true)
 const { y } = useScroll(window)
@@ -38,23 +39,8 @@ onMounted(() => {
   <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-6xl px-4">
     <nav class="navbar bg-base-300/70 backdrop-blur-xl shadow-lg rounded-full border border-base-content/10">
       <div class="flex-1">
-        <NuxtLink class="btn btn-ghost rounded-full" to="/">
-          <!-- Light Mode Logo (dark logo) -->
-          <svg class="h-8 block dark:hidden fill-white" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <g><g>
-              <path d="m365.5,191.5v-106.7c0-7.2-3.8-13.8-9.9-17.5l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.1-3.7 9.9-10.3 9.9-17.5z"/>
-              <path d="m220,303l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0-7.2-3.7-13.8-9.9-17.5z"/>
-              <path d="m491.1,302.9l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0.1-7.2-3.7-13.8-9.8-17.5z"/>
-            </g></g>
-          </svg>
-          <!-- Dark Mode Logo (light logo) -->
-          <svg class="h-8 hidden dark:block fill-base-100" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <g><g>
-              <path d="m365.5,191.5v-106.7c0-7.2-3.8-13.8-9.9-17.5l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.1-3.7 9.9-10.3 9.9-17.5z"/>
-              <path d="m220,303l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0-7.2-3.7-13.8-9.9-17.5z"/>
-              <path d="m491.1,302.9l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0.1-7.2-3.7-13.8-9.8-17.5z"/>
-            </g></g>
-          </svg>
+        <NuxtLink class="btn btn-ghost rounded-full flex justify-center items-center" to="/">
+          <Logo class="h-8 w-8" fillColor="fill-base-content" />
         </NuxtLink>
       </div>
       

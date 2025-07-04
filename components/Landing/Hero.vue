@@ -1,3 +1,8 @@
+<script setup lang="ts">
+import Logo from '../Layout/Logo.vue'
+const repoLink = "https://github.com/nujinDevelopment/boilerplate"
+</script>
+
 <template>
   <div class="hero min-h-screen bg-base-100 relative overflow-hidden" id="hero">
     <!-- Animated Background -->
@@ -9,13 +14,7 @@
     
     <div class="hero-content text-center relative z-10 px-4">
       <div class="max-w-3xl">
-        <svg class="w-16 h-16 mx-auto mb-8 fill-white" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-aos="fade-down">
-          <g><g>
-            <path d="m365.5,191.5v-106.7c0-7.2-3.8-13.8-9.9-17.5l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.1-3.7 9.9-10.3 9.9-17.5z"/>
-            <path d="m220,303l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89.1,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0-7.2-3.7-13.8-9.9-17.5z"/>
-            <path d="m491.1,302.9l-89-53.4c-6.5-3.9-14.5-3.9-21,0l-89.1,53.4c-6.2,3.7-9.9,10.3-9.9,17.5v106.7c0,7.2 3.8,13.8 9.9,17.5l89,53.4c9.4,5.4 17.2,2.5 21,0l89-53.4c6.2-3.7 9.9-10.3 9.9-17.5v-106.7c0.1-7.2-3.7-13.8-9.8-17.5z"/>
-          </g></g>
-        </svg>
+        <Logo class="w-16 h-16 mx-auto mb-8" fillColor="fill-base-content" data-aos="fade-down" />
 
         <h1 class="text-3xl pb-4">nujin</h1>
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-base-200/50 backdrop-blur-sm mb-8" data-aos="fade-down">
@@ -46,10 +45,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const repoLink = "https://github.com/nujinDevelopment/boilerplate"
-</script>
 
 <style scoped>
 /* Animations */
